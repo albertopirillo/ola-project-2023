@@ -1,1 +1,2 @@
-# ola-project-2023
+# Online Learning Applications
+## Pricing-Advertising project
