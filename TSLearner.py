@@ -11,6 +11,7 @@ class TSLearner(Learner):
         idx = np.argmax(np.random.beta(self.beta_parameters[:, 0], self.beta_parameters[:, 1]))
         return idx
 
+    # TODO: consider both price and conversion to determine optimal arm?
     def update(self, pulled_arm, reward):
         self.t += 1  # update the number of rounds
         self.update_observations(pulled_arm, reward)  # update the observation of the pulled arm

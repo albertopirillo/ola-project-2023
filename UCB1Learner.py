@@ -12,6 +12,7 @@ class UCB1Learner(Learner):
         upper_conf = self.empirical_means + self.confidence
         return np.random.choice(np.where(upper_conf == upper_conf.max())[0])
 
+    # TODO: consider both price and conversion to determine optimal arm?
     def update(self, pull_arm, reward):
         self.t += 1
         self.empirical_means[pull_arm] = (self.empirical_means[pull_arm] * (self.t - 1) + reward) / self.t

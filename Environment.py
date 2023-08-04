@@ -13,7 +13,7 @@ class Environment:
         self.class_probabilities = class_probabilities  # distributions of the classes
 
     def round(self, arm_index) -> int:
-        extracted_class: int = np.random.choice(np.arange(3), size=1, p=self.class_probabilities)
+        extracted_class: int = np.random.choice(self.num_classes, p=self.class_probabilities)
         features: np.ndarray[int] = np.zeros(2)
         match extracted_class:
             case 0:
@@ -26,7 +26,7 @@ class Environment:
                 features[0] = 1
                 features[1] = 1
 
-        reward: int = np.random.binomial(1, self.arms_mean[extracted_class][arm_index], size=1)
+        reward: int = np.random.binomial(1, self.arms_mean[extracted_class][arm_index])
         return reward
 
     # Function to add noise to the bid_to_click curve whenever a sample is drawn

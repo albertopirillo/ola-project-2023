@@ -8,10 +8,11 @@ class ClairvoyantAlgorithm:
 
     def compute_optimal_solution(self) -> float:
         total_reward: float = 0
-        # Find the best price (conversion rate) for each class
-        best_arms_ids: np.ndarray[int] = np.argmax(self.environment.arms_mean, axis=1)
-        best_arms_mean: np.ndarray[float] = np.max(self.environment.arms_mean, axis=1)
+        # Find the best price for each class, which requires considering both the conversion rate and the price
         # Arm's mean is the conversion rate
+        prices_dot_conv: np.ndarray[float] = self.environment.arms_mean * self.environment.prices
+        best_arms_ids: np.ndarray[int] = np.argmax(prices_dot_conv, axis=1)
+        best_arms_mean: np.ndarray[float] = np.max(prices_dot_conv, axis=1)
 
         # Optimize the reward w.r.t. the bid for each class independently
         for user_class in range(self.environment.num_classes):
