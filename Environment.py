@@ -30,14 +30,14 @@ class Environment:
         return reward
 
     # Function to add noise to the bid_to_click curve whenever a sample is drawn
-    def generate_observation_from_click(self, bids: float, user_class: int) -> float:
+    def generate_observation_from_click(self, bids: np.ndarray[float], user_class: int) -> float:
         return self.bid_to_clicks(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std)
 
     # Function to add noise to the bid_to_daily_cost curve whenever a sample is drawn
-    def generate_observation_from_daily_cost(self, bids: float, user_class: int) -> float:
+    def generate_observation_from_daily_cost(self, bids:  np.ndarray[float], user_class: int) -> float:
         return self.bid_to_daily_cost(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std)
 
-    def bid_to_clicks(self, bids: float, user_class: int) -> float:
+    def bid_to_clicks(self, bids: np.ndarray[float], user_class: int) -> float:
         """ Curves expressing the average dependence between the bid and the number of clicks """
         if user_class == 0:
             return 100 * (1.0 - np.exp(-4 * bids + 3 * bids ** 3))
@@ -46,7 +46,7 @@ class Environment:
         else:
             return 100 * (1.0 - np.exp(-6 * bids + 3 * bids ** 2))
 
-    def bid_to_daily_cost(self, bids: float, user_class: int):
+    def bid_to_daily_cost(self, bids: np.ndarray[float], user_class: int):
         """ Curves expressing the average dependence between the bid and the cumulative daily cost """
         if user_class == 0:
             return 100 * (1.0 - np.exp(-4 * bids + 5 * bids ** 2))

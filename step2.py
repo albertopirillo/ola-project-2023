@@ -2,16 +2,20 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm import trange
 
+# import warnings
+# from sklearn.exceptions import ConvergenceWarning
+# warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
+
 from ClairvoyantAlgorithm import ClairvoyantAlgorithm
 from Environment import Environment
-from TSLearner import TSLearner
-from UCB1Learner import UCB1Learner
+from GPTSLearner import GPTSLearner
+from GPUCBLearner import GPUCBLearner
 from utils import plot_statistics
 
 # Environment parameters
 num_classes = 3
-num_arms = 5
-bids = np.linspace(0, 100, 100)
+num_arms = 100
+bids = np.linspace(0, 1, 100)
 prices = np.array([15.5, 30.7, 60.2, 70.6, 90.8])
 noise_mean = 0.2
 noise_std = 0.7
@@ -22,7 +26,7 @@ class_probabilities = np.array([1, 0, 0])
 
 # Simulation parameters
 T = 365
-n_experiments = 100
+n_experiments = 10
 
 # History
 instantaneous_reward_clairvoyant = np.zeros(shape=(n_experiments, T))
@@ -37,38 +41,39 @@ if __name__ == '__main__':
     for e in trange(n_experiments):
         # For every experiment, we define new environment and learners
         env = Environment(num_classes, bids, prices, noise_mean, noise_std, arms_mean, class_probabilities)
+        observations = env.generate_observation_from_click(bids, user_class=0)
         clairvoyant = ClairvoyantAlgorithm(env)
-        ucb1_learner = UCB1Learner(num_arms)
-        ts_learner = TSLearner(num_arms)
+        gp_ucb_learner = GPUCBLearner(num_arms, observations)
+        gp_ts_learner = GPTSLearner(num_arms, observations)
 
-        for t in range(T):
+        for t in trange(T):
             # Clairvoyant Algorithm
-            best_arm_id = np.argmax(env.arms_mean, axis=1)[0]
-            best_arm_mean = np.max(env.arms_mean, axis=1)[0]
-            opt_reward = best_arm_mean
+            num_clicks: list[float] = [env.bid_to_clicks(bid, 0) for bid in bids]
+            best_bid = np.argmax(num_clicks)
+            opt_reward = np.max(num_clicks)
 
             instantaneous_reward_clairvoyant[e][t] = opt_reward
             instantaneous_regret_clairvoyant[e][t] = 0
 
-            # UCB1 Learner
-            pulled_arm = ucb1_learner.pull_arm()
-            reward = env.round(pulled_arm)
-            ucb1_learner.update(pulled_arm, reward)
+            # GP-UCB Learner
+            pulled_arm = gp_ucb_learner.pull_arm()
+            reward = env.generate_observation_from_click(bids[pulled_arm], user_class=0)
+            gp_ucb_learner.update(pulled_arm, reward)
 
             instantaneous_reward_ucb1[e][t] = reward
             regret = opt_reward - reward
             instantaneous_regret_ucb1[e][t] = regret
 
-            # Thompson Sampling Learner
-            pulled_arm = ts_learner.pull_arm()
-            reward = env.round(pulled_arm)
-            ts_learner.update(pulled_arm, reward)
+            # GP Thompson Sampling Learner
+            pulled_arm = gp_ts_learner.pull_arm()
+            reward = env.generate_observation_from_click(bids[pulled_arm], user_class=0)
+            gp_ts_learner.update(pulled_arm, reward)
 
             instantaneous_reward_ts[e][t] = reward
             regret = opt_reward - reward
             instantaneous_regret_ts[e][t] = regret
 
     plot_statistics(instantaneous_reward_clairvoyant, instantaneous_regret_clairvoyant, 'Clairvoyant')
-    plot_statistics(instantaneous_reward_ucb1, instantaneous_regret_ucb1, 'UCB1')
-    plot_statistics(instantaneous_reward_ts, instantaneous_regret_ts, 'TS')
+    plot_statistics(instantaneous_reward_ucb1, instantaneous_regret_ucb1, 'GP-UCB')
+    plot_statistics(instantaneous_reward_ts, instantaneous_regret_ts, 'GP-TS')
     plt.show()
