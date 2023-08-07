@@ -22,13 +22,14 @@ def compute_statistics(instantaneous_values: np.ndarray[float]) ->\
     return inst_mean, inst_std, cumulative_mean, cumulative_std
 
 
-def plot_with_std(figure_id: int, y_label: str, curve_label: str, 
+def plot_with_std(figure_id: int, y_label: str, curve_label: str, title: str,
                   values_mean: np.ndarray[float], values_std: np.ndarray[float]) -> None:
     """
     Plot the mean of the values with the corresponding standard deviation
     :param figure_id: the id of the figure
-    :param y_label: the label of the y axis
+    :param y_label: the label of the y-axis
     :param curve_label: the label to show on the legend
+    :param title: the title of the plot
     :param values_mean: a 1D array of shape (num_time_instants) containing the mean of the values
     :param values_std: a 1D array of shape (num_time_instants) containing the std of the values
     :return:
@@ -38,22 +39,25 @@ def plot_with_std(figure_id: int, y_label: str, curve_label: str,
     plt.ylabel(y_label)
     plt.plot(values_mean, label=curve_label)
     plt.fill_between(range(len(values_mean)), values_mean - values_std, values_mean + values_std, alpha=0.2)
+    plt.title(title)
     plt.legend()
 
 
-def plot_statistics(instantaneous_rewards: np.ndarray[float],
-                    instantaneous_regrets: np.ndarray[float], label: str) -> None:
+def plot_statistics(instantaneous_rewards: np.ndarray[float], instantaneous_regrets: np.ndarray[float],
+                    legend_label: str, title: str) -> None:
     """
     Plot the mean of the instantaneous and cumulative rewards and regrets with the corresponding standard deviation
     Once all plots have been generated, call plt.show() to display them
     :param instantaneous_rewards: a 2D array of shape (num_experiments, num_time_instants)
     :param instantaneous_regrets: a 2D array of shape (num_experiments, num_time_instants)
-    :param label: the label to show on the legend
+    :param legend_label: the label to show on the legend
+    :param title: the title of the plot
     :return:
     """
+    title = f'{title} ({len(instantaneous_rewards)} experiments)'
     i_reward_mean, i_reward_std, c_reward_mean, c_reward_std = compute_statistics(instantaneous_rewards)
     i_regret_mean, i_regret_std, c_regret_mean, c_regret_std = compute_statistics(instantaneous_regrets)
-    plot_with_std(0, 'Instantaneous reward', label, i_reward_mean, i_reward_std)
-    plot_with_std(1, 'Instantaneous regret', label, i_regret_mean, i_regret_std)
-    plot_with_std(2, 'Cumulative reward', label, c_reward_mean, c_reward_std)
-    plot_with_std(3, 'Cumulative regret', label, c_regret_mean, c_regret_std)
+    plot_with_std(0, 'Instantaneous reward', legend_label, title, i_reward_mean, i_reward_std)
+    plot_with_std(1, 'Instantaneous regret', legend_label, title, i_regret_mean, i_regret_std)
+    plot_with_std(2, 'Cumulative reward', legend_label, title, c_reward_mean, c_reward_std)
+    plot_with_std(3, 'Cumulative regret', legend_label, title, c_regret_mean, c_regret_std)

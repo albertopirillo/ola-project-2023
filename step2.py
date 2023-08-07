@@ -73,7 +73,7 @@ if __name__ == '__main__':
             regret = opt_reward - reward
             instantaneous_regret_ts[e][t] = regret
 
-    plot_statistics(instantaneous_reward_clairvoyant, instantaneous_regret_clairvoyant, 'Clairvoyant')
-    plot_statistics(instantaneous_reward_ucb1, instantaneous_regret_ucb1, 'GP-UCB')
-    plot_statistics(instantaneous_reward_ts, instantaneous_regret_ts, 'GP-TS')
+    plot_statistics(instantaneous_reward_clairvoyant, instantaneous_regret_clairvoyant, 'Clairvoyant', 'Step 2')
+    plot_statistics(instantaneous_reward_ucb1, instantaneous_regret_ucb1, 'GP-UCB', 'Step 2')
+    plot_statistics(instantaneous_reward_ts, instantaneous_regret_ts, 'GP-TS', 'Step 2')
     plt.show()
