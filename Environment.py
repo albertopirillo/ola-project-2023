@@ -31,11 +31,13 @@ class Environment:
 
     # Function to add noise to the bid_to_click curve whenever a sample is drawn
     def generate_observation_from_click(self, bids: np.ndarray[float], user_class: int) -> float:
-        return self.bid_to_clicks(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std)
+        size = 1 if isinstance(bids, float) else len(bids)
+        return self.bid_to_clicks(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std, size=size)
 
     # Function to add noise to the bid_to_daily_cost curve whenever a sample is drawn
-    def generate_observation_from_daily_cost(self, bids:  np.ndarray[float], user_class: int) -> float:
-        return self.bid_to_daily_cost(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std)
+    def generate_observation_from_daily_cost(self, bids: np.ndarray[float], user_class: int) -> float:
+        size = 1 if isinstance(bids, float) else len(bids)
+        return self.bid_to_daily_cost(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std, size=size)
 
     def bid_to_clicks(self, bids: np.ndarray[float], user_class: int) -> float:
         """ Curves expressing the average dependence between the bid and the number of clicks """

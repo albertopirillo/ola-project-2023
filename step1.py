@@ -13,8 +13,8 @@ num_classes = 3
 num_arms = 5
 bids = np.linspace(0, 100, 100)
 prices = np.array([15.5, 30.7, 60.2, 70.6, 90.8])
-noise_mean = 0.2
-noise_std = 0.7
+noise_mean = 0.0
+noise_std = 5.0
 arms_mean = np.array([[0.4, 0.7, 0.3, 0.2, 0.1],
                       [0.1, 0.2, 0.1, 0.1, 0.1],
                       [0.1, 0.1, 0.3, 0.1, 0.0]])

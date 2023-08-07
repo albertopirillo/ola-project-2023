@@ -12,8 +12,8 @@ class GPTSLearner(Learner):
         self.sigmas = np.ones(self.n_arms) * 10
         self.pulled_arms = []
         alpha = 0.5  # standard deviation of the noise
-        kernel = C(1., (1e-15, 1e3)) * RBF(1., (1e-15, 1e3))
-        self.gp = GaussianProcessRegressor(kernel=kernel, alpha=alpha ** 2, normalize_y=True, n_restarts_optimizer=9)
+        self.kernel = C(1., (1e-15, 1e3)) * RBF(1., (1e-15, 1e3))
+        self.gp = GaussianProcessRegressor(kernel=self.kernel, alpha=alpha ** 2, normalize_y=True, n_restarts_optimizer=5)
 
     def update_observations(self, arm_idx, reward):
         super().update_observations(arm_idx, reward)
