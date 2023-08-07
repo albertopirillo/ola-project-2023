@@ -17,7 +17,7 @@ class GPUCBLearner(Learner):
         self.pulled_arms = []
         alpha = 0.5  # standard deviation of the noise
         kernel = C(1., (1e-12, 1e3)) * RBF(1., (1e-12, 1e3))
-        self.gp = GaussianProcessRegressor(kernel=kernel, alpha=alpha ** 2, normalize_y=True, n_restarts_optimizer=9)
+        self.gp = GaussianProcessRegressor(kernel=kernel, alpha=alpha ** 2, normalize_y=True, n_restarts_optimizer=5)
 
     def update_observations(self, arm_idx, reward):
         super().update_observations(arm_idx, reward)
