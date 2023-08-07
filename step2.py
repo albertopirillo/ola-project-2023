@@ -10,7 +10,7 @@ from ClairvoyantAlgorithm import ClairvoyantAlgorithm
 from Environment import Environment
 from GPTSLearner import GPTSLearner
 from GPUCBLearner import GPUCBLearner
-from utils import plot_statistics
+from utils import plot_statistics, compute_reward
 
 # Environment parameters
 num_classes = 3
@@ -38,10 +38,6 @@ instantaneous_regret_ucb1 = np.zeros(shape=(n_experiments, T))
 instantaneous_regret_ts = np.zeros(shape=(n_experiments, T))
 
 
-def compute_reward(conv_rate: float, price: float, bid: float) -> float:
-    return (env.generate_observation_from_click(bid, user_class=0) * conv_rate * (price - bid)) - env.generate_observation_from_daily_cost(bid, user_class=0)
-
-
 if __name__ == '__main__':
     opt_arm_id = np.argmax(arms_mean, axis=1)[0]
     opt_conv_rate = np.max(arms_mean, axis=1)[0]
@@ -64,7 +60,7 @@ if __name__ == '__main__':
 
             # GP-UCB Learner
             pulled_arm = gp_ucb_learner.pull_arm()
-            reward = compute_reward(opt_conv_rate, opt_price, bids[pulled_arm])
+            reward = compute_reward(env, opt_conv_rate, opt_price, bids[pulled_arm], user_class=0)
             gp_ucb_learner.update(pulled_arm, reward)
 
             instantaneous_reward_ucb1[e][t] = reward
@@ -73,7 +69,7 @@ if __name__ == '__main__':
 
             # GP Thompson Sampling Learner
             pulled_arm = gp_ts_learner.pull_arm()
-            reward = compute_reward(opt_conv_rate, opt_price, bids[pulled_arm])
+            reward = compute_reward(env, opt_conv_rate, opt_price, bids[pulled_arm], user_class=0)
             gp_ts_learner.update(pulled_arm, reward)
 
             instantaneous_reward_ts[e][t] = reward

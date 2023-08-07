@@ -15,7 +15,7 @@ from GPTSLearner import GPTSLearner
 from GPUCBLearner import GPUCBLearner
 from TSLearner import TSLearner
 from UCB1Learner import UCB1Learner
-from utils import plot_statistics
+from utils import plot_statistics, compute_reward
 
 # Environment parameters
 num_classes = 3
@@ -30,9 +30,11 @@ arms_mean = np.array([[0.4, 0.7, 0.3, 0.2, 0.1],
                       [0.1, 0.1, 0.3, 0.1, 0.0]])
 class_probabilities = np.array([1, 0, 0])
 
+
 # Simulation parameters
 T = 125
-n_experiments = 5
+n_experiments = 10
+
 
 # History
 instantaneous_reward_clairvoyant = np.zeros(shape=(n_experiments, T))
@@ -42,11 +44,6 @@ instantaneous_reward_ts = np.zeros(shape=(n_experiments, T))
 instantaneous_regret_clairvoyant = np.zeros(shape=(n_experiments, T))
 instantaneous_regret_ucb1 = np.zeros(shape=(n_experiments, T))
 instantaneous_regret_ts = np.zeros(shape=(n_experiments, T))
-
-
-def compute_reward(conv_rate: float, price: float, bid: float) -> float:
-    return (env.generate_observation_from_click(bid, user_class=0) * conv_rate * (price - bid)) - env.generate_observation_from_daily_cost(bid, user_class=0)
-
 
 if __name__ == '__main__':
     for e in trange(n_experiments):
@@ -58,7 +55,6 @@ if __name__ == '__main__':
         ts_learner = TSLearner(num_arms_pricing)
         gp_ucb_learner = GPUCBLearner(num_arms_advertising, observations)
         gp_ts_learner = GPTSLearner(num_arms_advertising, observations)
-
 
         for t in range(T):
             # Clairvoyant Algorithm
@@ -75,15 +71,13 @@ if __name__ == '__main__':
             pricing_reward = env.round(pulled_arm)
             ucb1_learner.update(pulled_arm, pricing_reward)
 
-            # TODO: check that empirical means are correct
             prices_dot_conv = ucb1_learner.empirical_means * prices
             best_arm_id = int(np.argmax(prices_dot_conv))
             best_conv_rate = ucb1_learner.empirical_means[best_arm_id]
             best_price = prices[best_arm_id]
 
-
             pulled_arm = gp_ucb_learner.pull_arm()
-            reward = compute_reward(best_conv_rate, best_price, bids[pulled_arm])
+            reward = compute_reward(env, best_conv_rate, best_price, bids[pulled_arm], user_class=0)
             gp_ucb_learner.update(pulled_arm, reward)
 
             instantaneous_reward_ucb1[e][t] = reward[0]
@@ -98,12 +92,10 @@ if __name__ == '__main__':
             print(f'Best bid: {bids[pulled_arm]}')
             print(f'Reward: {reward}')
 
-
             # TS and GP Thompson Sampling Learner
             pulled_arm = ts_learner.pull_arm()
             pricing_reward = env.round(pulled_arm)
             ts_learner.update(pulled_arm, pricing_reward)
-
 
             # alpha / (alpha + beta)
             # TODO: check that empirical means are correct
@@ -114,7 +106,7 @@ if __name__ == '__main__':
             best_price = prices[best_arm_id]
 
             pulled_arm = gp_ts_learner.pull_arm()
-            reward = compute_reward(best_conv_rate, best_price, bids[pulled_arm])
+            reward = compute_reward(env, best_conv_rate, best_price, bids[pulled_arm], user_class=0)
             gp_ts_learner.update(pulled_arm, reward)
 
             print(f'TS')
@@ -126,10 +118,9 @@ if __name__ == '__main__':
             print(f'Reward: {reward}')
             print('------------------------------------------------------------------')
 
-            instantaneous_reward_ucb1[e][t] = reward[0]
+            instantaneous_reward_ts[e][t] = reward[0]
             regret = opt_reward - reward[0]
-            instantaneous_regret_ucb1[e][t] = regret
-
+            instantaneous_regret_ts[e][t] = regret
 
     plot_statistics(instantaneous_reward_clairvoyant, instantaneous_regret_clairvoyant, 'Clairvoyant', 'Step 3')
     plot_statistics(instantaneous_reward_ucb1, instantaneous_regret_ucb1, 'UCB1 & GP-UCB', 'Step 3')

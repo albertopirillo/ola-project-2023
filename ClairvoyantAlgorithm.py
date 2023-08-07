@@ -1,6 +1,7 @@
 import numpy as np
 import logging
 from Environment import Environment
+from utils import compute_reward_clairvoyant
 
 
 class ClairvoyantAlgorithm:
@@ -19,7 +20,7 @@ class ClairvoyantAlgorithm:
             best_price: float = self.environment.prices[best_arm_id]
 
             # Optimize the reward w.r.t. the bid for each class independently
-            rewards: list[float] = [self.compute_reward(bid, user_class, best_price, best_conv_rate)
+            rewards: list[float] = [compute_reward_clairvoyant(self.environment, best_conv_rate, best_price, bid, user_class)
                                     for bid in self.environment.bids]
             class_reward.append(np.max(rewards))
 
@@ -33,12 +34,3 @@ class ClairvoyantAlgorithm:
         weighted_reward = float(np.dot(class_reward, self.environment.class_probabilities))
         logging.debug(f'Optimal total reward: {weighted_reward}')
         return weighted_reward
-
-    def compute_reward(self, bid: float, user_class: int, price: float, conv_rate: float) -> float:
-        """
-         Compute the reward = (number of daily clicks * conversion rate * margin) - the cumulative daily costs
-         The margin is given by the price minus the bid
-         """
-        return (self.environment.bid_to_clicks(bid, user_class) * conv_rate * (
-                    price - bid)) - self.environment.bid_to_daily_cost(bid, user_class)
-        # * self.environment.bid_to_clicks(bid, user_class))
