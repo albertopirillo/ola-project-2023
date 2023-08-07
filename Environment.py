@@ -32,27 +32,31 @@ class Environment:
     # Function to add noise to the bid_to_click curve whenever a sample is drawn
     def generate_observation_from_click(self, bids: np.ndarray[float], user_class: int) -> float:
         size = 1 if isinstance(bids, float) else len(bids)
-        return self.bid_to_clicks(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std, size=size)
+        clicks = self.bid_to_clicks(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std, size=size)
+        return np.maximum(clicks, 0)
 
     # Function to add noise to the bid_to_daily_cost curve whenever a sample is drawn
     def generate_observation_from_daily_cost(self, bids: np.ndarray[float], user_class: int) -> float:
         size = 1 if isinstance(bids, float) else len(bids)
-        return self.bid_to_daily_cost(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std, size=size)
+        cost = self.bid_to_daily_cost(bids, user_class) + np.random.normal(self.noise_mean, self.noise_std, size=size)
+        return np.maximum(cost, 0)
 
     def bid_to_clicks(self, bids: np.ndarray[float], user_class: int) -> float:
         """ Curves expressing the average dependence between the bid and the number of clicks """
         if user_class == 0:
-            return 100 * (1.0 - np.exp(-4 * bids + 3 * bids ** 3))
+            clicks = 100 * (1.0 - np.exp(-4 * bids + 3 * bids ** 3))
         elif user_class == 1:
-            return 100 * (1.0 - np.exp(-5 * bids + 3 * bids ** 2))
+            clicks = 100 * (1.0 - np.exp(-5 * bids + 3 * bids ** 2))
         else:
-            return 100 * (1.0 - np.exp(-6 * bids + 3 * bids ** 2))
+            clicks = 100 * (1.0 - np.exp(-6 * bids + 3 * bids ** 2))
+        return np.maximum(clicks, 0)
 
     def bid_to_daily_cost(self, bids: np.ndarray[float], user_class: int):
         """ Curves expressing the average dependence between the bid and the cumulative daily cost """
         if user_class == 0:
-            return 100 * (1.0 - np.exp(-4 * bids + 5 * bids ** 2))
+            cost = 100 * (5.5 - np.exp(-7 * bids + 5 * bids ** 2))
         elif user_class == 1:
-            return 100 * (1.0 - np.exp(-5 * bids + 6 * bids ** 3))
+            cost = 50 * (3.5 - np.exp(-10 * bids + 6 * bids ** 3))
         else:
-            return 100 * (1.0 - np.exp(-6 * bids + 7 * bids ** 3))
+            cost = 75 * (4.0 - np.exp(-8 * bids + 3 * bids ** 3))
+        return np.maximum(cost, 0)
