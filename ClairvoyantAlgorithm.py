@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 from Environment import Environment
 
 
@@ -7,26 +8,37 @@ class ClairvoyantAlgorithm:
         self.environment = environment
 
     def compute_optimal_solution(self) -> float:
-        total_reward: float = 0
-        # Find the best price for each class, which requires considering both the conversion rate and the price
-        # Arm's mean is the conversion rate
-        prices_dot_conv: np.ndarray[float] = self.environment.arms_mean * self.environment.prices
-        best_arms_ids: np.ndarray[int] = np.argmax(prices_dot_conv, axis=1)
-        best_arms_mean: np.ndarray[float] = np.max(prices_dot_conv, axis=1)
+        class_reward: list[float] = list()
 
-        # Optimize the reward w.r.t. the bid for each class independently
         for user_class in range(self.environment.num_classes):
-            rewards: list[float] = [self.compute_reward(bid, user_class, best_arms_ids, best_arms_mean) for bid in
-                                    self.environment.bids]
-            total_reward += np.max(rewards)
+            # Find the best price which requires considering both the conversion rate, and the actual price
+            # Arm's mean is the conversion rate
+            prices_dot_conv: np.ndarray[float] = self.environment.arms_mean[user_class] * self.environment.prices
+            best_arm_id: int = int(np.argmax(prices_dot_conv))
+            best_conv_rate: float = self.environment.arms_mean[user_class][best_arm_id]
+            best_price: float = self.environment.prices[best_arm_id]
 
-        # Return the reward of the optimal solution
-        return total_reward
+            # Optimize the reward w.r.t. the bid for each class independently
+            rewards: list[float] = [self.compute_reward(bid, user_class, best_price, best_conv_rate)
+                                    for bid in self.environment.bids]
+            class_reward.append(np.max(rewards))
 
-    def compute_reward(self, bid: float, user_class: int, best_prices_ids: np.ndarray[int],
-                       best_arms_mean: np.ndarray[float]) -> float:
-        """ Compute the reward = (number of daily clicks * conversion rate * margin) - the cumulative daily costs """
-        return ((self.environment.bid_to_clicks(bid, user_class) * best_arms_mean[user_class]
-                * self.environment.prices[best_prices_ids[user_class]] - bid) -
-                self.environment.bid_to_daily_cost(bid, user_class))
+            logging.debug('Clairvoyant algorithm')
+            logging.debug(f'Class {user_class}')
+            logging.debug(f'Optimal conversion rate: {best_conv_rate}')
+            logging.debug(f'Optimal price: {best_price}')
+            logging.debug(f'Optimal bid: {np.argmax(rewards)}')
+
+        # Return the reward of the optimal solution, weighted on the class probabilities
+        weighted_reward = float(np.dot(class_reward, self.environment.class_probabilities))
+        logging.debug(f'Optimal total reward: {weighted_reward}')
+        return weighted_reward
+
+    def compute_reward(self, bid: float, user_class: int, price: float, conv_rate: float) -> float:
+        """
+         Compute the reward = (number of daily clicks * conversion rate * margin) - the cumulative daily costs
+         The margin is given by the price minus the bid
+         """
+        return (self.environment.bid_to_clicks(bid, user_class) * conv_rate * (
+                    price - bid)) - self.environment.bid_to_daily_cost(bid, user_class)
         # * self.environment.bid_to_clicks(bid, user_class))
