@@ -1,7 +1,5 @@
-import numpy as np
 import matplotlib.pyplot as plt
-
-from Environment import Environment
+import numpy as np
 
 
 def compute_statistics(instantaneous_values: np.ndarray[float]) -> \
@@ -63,30 +61,3 @@ def plot_statistics(instantaneous_rewards: np.ndarray[float], instantaneous_regr
     plot_with_std(1, 'Instantaneous regret', legend_label, title, i_regret_mean, i_regret_std)
     plot_with_std(2, 'Cumulative reward', legend_label, title, c_reward_mean, c_reward_std)
     plot_with_std(3, 'Cumulative regret', legend_label, title, c_regret_mean, c_regret_std)
-
-
-def compute_reward_clairvoyant(env: Environment, conv_rate: float, price: float, bid: float, user_class: int) -> float:
-    """
-     Compute the reward = (number of daily clicks * conversion rate * margin) - the cumulative daily costs
-     The margin is given by the price minus the bid
-    :param env: the environment to use to take the number of daily clicks and the daily cost functions
-    :param conv_rate: the conversion rate
-    :param price: the price of the item
-    :param bid: the bid
-    :param user_class: the class of the user
-     """
-    return (env.bid_to_clicks(bid, user_class) * conv_rate * (price - bid)) - env.bid_to_daily_cost(bid, user_class)
-
-
-def compute_reward(env: Environment, conv_rate: float, price: float, bid: float, user_class: int) -> float:
-    """
-     Compute the reward = (number of daily clicks * conversion rate * margin) - the cumulative daily costs
-     The margin is given by the price minus the bid
-    :param env: the environment to use to take the number of daily clicks and the daily cost functions
-    :param conv_rate: the conversion rate
-    :param price: the price of the item
-    :param bid: the bid
-    :param user_class: the class of the user
-     """
-    return (env.generate_observation_from_click(bid, user_class) * conv_rate * (price - bid)
-            ) - env.generate_observation_from_daily_cost(bid, user_class)
