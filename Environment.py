@@ -1,4 +1,6 @@
+import json
 import numpy as np
+from typing import Self
 from sklearn.preprocessing import minmax_scale
 
 
@@ -14,6 +16,17 @@ class Environment:
         self.class_probabilities = class_probabilities  # distributions of the classes
         # When learning, consider the [0,1]-normalized conv_rates * prices
         self.mean_per_prices = minmax_scale((self.arms_mean * self.prices), axis=1)
+
+    @classmethod
+    def from_json(cls, json_path: str) -> Self:
+        with open(json_path) as f:
+            data = json.load(f)
+        # Convert from JSON arrays to Numpy arrays
+        data['bids'] = np.linspace(*data['bids'])
+        data['prices'] = np.array(data['prices'])
+        data['arms_mean'] = np.array(data['arms_mean'])
+        data['class_probabilities'] = np.array(data['class_probabilities'])
+        return cls(**data)
 
     def round(self, arm_index) -> int:
         extracted_class: int = np.random.choice(self.num_classes, p=self.class_probabilities)
