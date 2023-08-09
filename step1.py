@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from tqdm import trange
+from tqdm.contrib.concurrent import process_map
 
 from ClairvoyantAlgorithm import ClairvoyantAlgorithm
 from Environment import Environment
@@ -10,57 +10,75 @@ from utils import plot_statistics
 
 # Simulation parameters
 T = 365
-n_experiments = 1000
+n_experiments = 5000
 
-# History
-instantaneous_reward_clairvoyant = np.zeros(shape=(n_experiments, T))
-instantaneous_reward_ucb1 = np.zeros(shape=(n_experiments, T))
-instantaneous_reward_ts = np.zeros(shape=(n_experiments, T))
 
-instantaneous_regret_clairvoyant = np.zeros(shape=(n_experiments, T))
-instantaneous_regret_ucb1 = np.zeros(shape=(n_experiments, T))
-instantaneous_regret_ts = np.zeros(shape=(n_experiments, T))
+def run_experiment(_):
+    # For every experiment, we define new environment and learners
+    env = Environment.from_json('data/environment.json')
+    # Advertising curves (optimal bid) are known
+    clairvoyant = ClairvoyantAlgorithm(env)
+    opt_reward = clairvoyant.optimal_rewards[0]
+    opt_bid_id = clairvoyant.optimal_bids_id[0]
+    # Learners
+    ucb1_learner = UCB1Learner(len(env.prices))
+    ts_learner = TSLearner(len(env.prices))
+
+    # Data structures
+    instantaneous_reward_clairvoyant = np.zeros(T)
+    instantaneous_reward_ucb1 = np.zeros(T)
+    instantaneous_reward_ts = np.zeros(T)
+
+    instantaneous_regret_clairvoyant = np.zeros(T)
+    instantaneous_regret_ucb1 = np.zeros(T)
+    instantaneous_regret_ts = np.zeros(T)
+
+    for t in range(T):
+        # Clairvoyant algorithm
+        instantaneous_reward_clairvoyant[t] = opt_reward
+        instantaneous_regret_clairvoyant[t] = 0
+
+        # UCB1 learner
+        pulled_arm = ucb1_learner.pull_arm()
+        pricing_reward = env.round(pulled_arm)
+        ucb1_learner.update(pulled_arm, pricing_reward)
+
+        total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
+        instantaneous_reward_ucb1[t] = total_reward
+        regret = opt_reward - total_reward
+        instantaneous_regret_ucb1[t] = regret
+
+        # Thompson Sampling learner
+        pulled_arm = ts_learner.pull_arm()
+        pricing_reward = env.round(pulled_arm)
+        ts_learner.update(pulled_arm, pricing_reward)
+
+        total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
+        instantaneous_reward_ts[t] = total_reward
+        regret = opt_reward - total_reward
+        instantaneous_regret_ts[t] = regret
+
+    return instantaneous_reward_clairvoyant, instantaneous_reward_ucb1, instantaneous_reward_ts, \
+        instantaneous_regret_clairvoyant, instantaneous_regret_ucb1, instantaneous_regret_ts
 
 
 if __name__ == '__main__':
-    for e in trange(n_experiments):
-        # For every experiment, we define new environment and learners
-        env = Environment.from_json('data/environment.json')
-        # Advertising curves (optimal bid) are known
-        clairvoyant = ClairvoyantAlgorithm(env)
-        opt_reward = clairvoyant.optimal_rewards[0]
-        opt_bid_id = clairvoyant.optimal_bids_id[0]
-        # Learners
-        ucb1_learner = UCB1Learner(len(env.prices))
-        ts_learner = TSLearner(len(env.prices))
+    # Run the experiments in parallel
+    results_list = process_map(run_experiment, range(n_experiments), max_workers=12, chunksize=1)
+    # Array of shape (n_experiments, 6, T)
+    results_array = np.array(results_list)
 
-        for t in range(T):
-            # Clairvoyant algorithm
-            instantaneous_reward_clairvoyant[e][t] = opt_reward
-            instantaneous_regret_clairvoyant[e][t] = 0
+    # Extract the results into six arrays of shape (n_experiments, T)
+    inst_reward_clairvoyant = results_array[:, 0, :]
+    inst_reward_ucb1 = results_array[:, 1, :]
+    inst_reward_ts = results_array[:, 2, :]
+    inst_regret_clairvoyant = results_array[:, 3, :]
+    inst_regret_ucb1 = results_array[:, 4, :]
+    inst_regret_ts = results_array[:, 5, :]
 
-            # UCB1 learner
-            pulled_arm = ucb1_learner.pull_arm()
-            pricing_reward = env.round(pulled_arm)
-            ucb1_learner.update(pulled_arm, pricing_reward)
-
-            total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
-            instantaneous_reward_ucb1[e][t] = total_reward
-            regret = opt_reward - total_reward
-            instantaneous_regret_ucb1[e][t] = regret
-
-            # Thompson Sampling learner
-            pulled_arm = ts_learner.pull_arm()
-            pricing_reward = env.round(pulled_arm)
-            ts_learner.update(pulled_arm, pricing_reward)
-
-            total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
-            instantaneous_reward_ts[e][t] = total_reward
-            regret = opt_reward - total_reward
-            instantaneous_regret_ts[e][t] = regret
-
-    plot_statistics(instantaneous_reward_clairvoyant, instantaneous_regret_clairvoyant, 'Clairvoyant', 'Step 1')
-    plot_statistics(instantaneous_reward_ucb1, instantaneous_regret_ucb1, 'UCB1', 'Step 1')
-    plot_statistics(instantaneous_reward_ts, instantaneous_regret_ts, 'TS', 'Step 1')
+    # Generate plots of the mean and standard deviation of the results
+    plot_statistics(inst_reward_clairvoyant, inst_regret_clairvoyant, 'Clairvoyant', 'Step 1')
+    plot_statistics(inst_reward_ucb1, inst_regret_ucb1, 'UCB1', 'Step 1')
+    plot_statistics(inst_reward_ts, inst_regret_ts, 'TS', 'Step 1')
     plt.tight_layout()
     plt.show()
