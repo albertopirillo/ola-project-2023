@@ -56,19 +56,7 @@ if __name__ == '__main__':
             pricing_reward = env.round(pulled_arm)
             ucb1_learner.update(pulled_arm, pricing_reward)
 
-            prices_dot_conv = ucb1_learner.empirical_means * prices
-            best_arm_id = int(np.argmax(prices_dot_conv))
-
-            # print('------------------------------------------------------------------------------')
-            # print('Ams means:')
-            # print(f'- True: {arms_mean[0]}')
-            # print(f'- Estimated: {ucb1_learner.empirical_means}\n')
-            # print('Conv_rate x prices:')
-            # print(f'- True: {arms_mean[0] * prices}')
-            # print(f'- Estimated: {prices_dot_conv}\n')
-            # print(f'Best arm id: {best_arm_id}')
-
-            total_reward = env.compute_reward(best_arm_id, opt_bid_id, user_class=0)
+            total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
             instantaneous_reward_ucb1[e][t] = total_reward
             regret = opt_reward - total_reward
             instantaneous_regret_ucb1[e][t] = regret
@@ -78,19 +66,7 @@ if __name__ == '__main__':
             pricing_reward = env.round(pulled_arm)
             ts_learner.update(pulled_arm, pricing_reward)
 
-            prices_dot_conv = ts_learner.get_empirical_means() * prices
-            best_arm_id = int(np.argmax(prices_dot_conv))
-
-            # print('------------------------------------------------------------------------------')
-            # print('Ams means:')
-            # print(f'- True: {arms_mean[0]}')
-            # print(f'- Estimated: {ts_learner.get_empirical_means()}\n')
-            # print('Conv_rate x prices:')
-            # print(f'- True: {arms_mean[0] * prices}')
-            # print(f'- Estimated: {prices_dot_conv}\n')
-            # print(f'Best arm id: {best_arm_id}')
-
-            total_reward = env.compute_reward(best_arm_id, opt_bid_id, user_class=0)
+            total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
             instantaneous_reward_ts[e][t] = total_reward
             regret = opt_reward - total_reward
             instantaneous_regret_ts[e][t] = regret

@@ -18,8 +18,8 @@ class ClairvoyantAlgorithm:
         for user_class in range(self.environment.num_classes):
             # Find the best price which requires considering both the conversion rate, and the actual price
             # Arm's mean is the conversion rate
-            prices_dot_conv: np.ndarray[float] = self.environment.arms_mean[user_class] * self.environment.prices
-            best_arm_id: int = int(np.argmax(prices_dot_conv))
+            # prices_dot_conv: np.ndarray[float] = self.environment.arms_mean[user_class] * self.environment.prices
+            best_arm_id: int = int(np.argmax(self.environment.mean_per_prices[user_class]))
             best_conv_rate: float = self.environment.arms_mean[user_class][best_arm_id]
             best_price: float = self.environment.prices[best_arm_id]
 

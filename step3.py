@@ -55,32 +55,26 @@ if __name__ == '__main__':
             instantaneous_regret_clairvoyant[e][t] = 0
 
             # UCB1 and GP-UCB learners
-            pulled_arm = ucb1_learner.pull_arm()
-            pricing_reward = env.round(pulled_arm)
-            ucb1_learner.update(pulled_arm, pricing_reward)
+            pulled_arm_pricing = ucb1_learner.pull_arm()
+            pricing_reward = env.round(pulled_arm_pricing)
+            ucb1_learner.update(pulled_arm_pricing, pricing_reward)
 
-            prices_dot_conv = ucb1_learner.empirical_means * prices
-            best_arm_id = int(np.argmax(prices_dot_conv))
-
-            pulled_arm = gp_ucb_learner.pull_arm()
-            total_reward = env.compute_reward(best_arm_id, pulled_arm, user_class=0)
-            gp_ucb_learner.update(pulled_arm, total_reward)
+            pulled_arm_advertising = gp_ucb_learner.pull_arm()
+            total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=0)
+            gp_ucb_learner.update(pulled_arm_advertising, total_reward)
 
             instantaneous_reward_ucb1[e][t] = total_reward
             regret = opt_reward - total_reward
             instantaneous_regret_ucb1[e][t] = regret
 
             # TS and GP-TS learners
-            pulled_arm = ts_learner.pull_arm()
-            pricing_reward = env.round(pulled_arm)
-            ts_learner.update(pulled_arm, pricing_reward)
+            pulled_arm_pricing = ts_learner.pull_arm()
+            pricing_reward = env.round(pulled_arm_pricing)
+            ts_learner.update(pulled_arm_pricing, pricing_reward)
 
-            prices_dot_conv = ts_learner.get_empirical_means() * prices
-            best_arm_id = int(np.argmax(prices_dot_conv))
-
-            pulled_arm = gp_ts_learner.pull_arm()
-            total_reward = env.compute_reward(best_arm_id, pulled_arm, user_class=0)
-            gp_ts_learner.update(pulled_arm, total_reward)
+            pulled_arm_advertising = gp_ts_learner.pull_arm()
+            total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=0)
+            gp_ts_learner.update(pulled_arm_advertising, total_reward)
 
             instantaneous_reward_ts[e][t] = total_reward
             regret = opt_reward - total_reward

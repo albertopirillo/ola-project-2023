@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.preprocessing import minmax_scale
 
 
 class Environment:
@@ -12,8 +13,7 @@ class Environment:
         self.arms_mean = arms_mean  # matrix containing bernoulli distributions of the arms for the prices
         self.class_probabilities = class_probabilities  # distributions of the classes
         # When learning, consider the [0,1]-normalized conv_rates * prices
-        self.mean_per_prices = (self.arms_mean * self.prices) / np.sum(self.arms_mean * self.prices, axis=1,
-                                                                       keepdims=True)
+        self.mean_per_prices = minmax_scale((self.arms_mean * self.prices), axis=1)
 
     def round(self, arm_index) -> int:
         extracted_class: int = np.random.choice(self.num_classes, p=self.class_probabilities)
@@ -29,7 +29,7 @@ class Environment:
                 features[0] = 1
                 features[1] = 1
 
-        reward: int = np.random.binomial(1, self.arms_mean[extracted_class][arm_index])
+        reward: int = np.random.binomial(1, self.mean_per_prices[extracted_class][arm_index])
         return reward
 
     # Function to add noise to the bid_to_click curve whenever a sample is drawn
