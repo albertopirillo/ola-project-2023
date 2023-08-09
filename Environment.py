@@ -89,23 +89,25 @@ class Environment:
         """
         conv_rate = self.conv_rates[user_class][price_index]
         price = self.prices[price_index]
+        cost = 0.0
         bid = self.bids[bid_index]
         daily_clicks = self.bid_to_clicks(bid, user_class)
         daily_cost = self.bid_to_daily_cost(bid, user_class)
-        return self.actual_reward(conv_rate, price, bid, daily_clicks, daily_cost)
+        return self.actual_reward(conv_rate, price, cost, daily_clicks, daily_cost)
 
     @staticmethod
-    def actual_reward(conv_rate: float, price: float, bid: float, daily_clicks: float, daily_cost: float) -> float:
+    def actual_reward(conv_rate: float, price: float, cost: float, daily_clicks: float, daily_cost: float) -> float:
         """
         Performs the actual computation of the reward given the parameters passed by the other functions.
         The reward is given by: (daily_clicks * conv_rate * margin) - cumulative_daily_cost
-        The margin is given by the price minus the bid.
+        The margin is given by the price minus the cost.
         This method should never be called directly.
-        :param conv_rate: the conversion rate
-        :param price: the price
+        :param conv_rate: the conversion rate of the product
+        :param price: the price of the product
+        :param cost: the cost to the company of the product
         :param bid: the bid
         :param daily_clicks: the number of daily clicks
-        :param daily_cost: the daily cost
+        :param daily_cost: the cumulative daily cost due to advertising
         :return:
         """
-        return (daily_clicks * conv_rate * (price - bid)) - daily_cost
+        return (daily_clicks * conv_rate * (price - cost)) - daily_cost
