@@ -17,10 +17,8 @@ class ClairvoyantAlgorithm:
     def compute_optimal_solution(self) -> None:
         for user_class in range(self.environment.num_classes):
             # Find the best price which requires considering both the conversion rate, and the actual price
-            # Arm's mean is the conversion rate
-            # prices_dot_conv: np.ndarray[float] = self.environment.arms_mean[user_class] * self.environment.prices
-            best_arm_id: int = int(np.argmax(self.environment.mean_per_prices[user_class]))
-            best_conv_rate: float = self.environment.arms_mean[user_class][best_arm_id]
+            best_arm_id: int = int(np.argmax(self.environment.arms_mean[user_class]))
+            best_conv_rate: float = self.environment.conv_rates[user_class][best_arm_id]
             best_price: float = self.environment.prices[best_arm_id]
 
             # Optimize the reward w.r.t. the bid for each class independently
@@ -41,8 +39,3 @@ class ClairvoyantAlgorithm:
             logging.debug(f'Optimal price: {best_price}')
             logging.debug(f'Optimal bid: {np.argmax(rewards)}')
             logging.debug(f'Optimal reward: {np.max(rewards)}')
-
-        # Return the reward of the optimal solution, weighted on the class probabilities
-        # weighted_reward = float(np.dot(class_reward, self.environment.class_probabilities))
-        # logging.debug(f'Optimal total reward: {weighted_reward}')
-        # return weighted_reward

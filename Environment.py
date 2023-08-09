@@ -6,16 +6,16 @@ from sklearn.preprocessing import minmax_scale
 
 class Environment:
     def __init__(self, num_classes: int, bids: np.ndarray[float], prices: np.ndarray[float], noise_mean: float,
-                 noise_std: float, arms_mean: np.ndarray[float], class_probabilities: np.ndarray[float]) -> None:
+                 noise_std: float, conv_rates: np.ndarray[float], class_probabilities: np.ndarray[float]) -> None:
         self.num_classes = num_classes  # number of classes
         self.bids = bids  # array containing the bids
         self.prices = prices  # prices of the tickets
         self.noise_mean = noise_mean  # mean of the noise to add to the drawn sample
         self.noise_std = noise_std  # std deviation of the noise to add to the drawn sample
-        self.arms_mean = arms_mean  # matrix containing bernoulli distributions of the arms for the prices
+        self.conv_rates = conv_rates  # matrix containing bernoulli distributions of the arms for the prices
         self.class_probabilities = class_probabilities  # distributions of the classes
         # When learning, consider the [0,1]-normalized conv_rates * prices
-        self.mean_per_prices = minmax_scale((self.arms_mean * self.prices), axis=1)
+        self.arms_mean = minmax_scale((self.conv_rates * self.prices), axis=1)
 
     @classmethod
     def from_json(cls, json_path: str) -> Self:
@@ -24,7 +24,7 @@ class Environment:
         # Convert from JSON arrays to Numpy arrays
         data['bids'] = np.linspace(*data['bids'])
         data['prices'] = np.array(data['prices'])
-        data['arms_mean'] = np.array(data['arms_mean'])
+        data['conv_rates'] = np.array(data['conv_rates'])
         data['class_probabilities'] = np.array(data['class_probabilities'])
         return cls(**data)
 
@@ -42,7 +42,7 @@ class Environment:
                 features[0] = 1
                 features[1] = 1
 
-        reward: int = np.random.binomial(1, self.mean_per_prices[extracted_class][arm_index])
+        reward: int = np.random.binomial(1, self.arms_mean[extracted_class][arm_index])
         return reward
 
     # Function to add noise to the bid_to_click curve whenever a sample is drawn
@@ -87,7 +87,7 @@ class Environment:
         :param user_class: the class of the current user
         :return:
         """
-        conv_rate = self.arms_mean[user_class][price_index]
+        conv_rate = self.conv_rates[user_class][price_index]
         price = self.prices[price_index]
         bid = self.bids[bid_index]
         daily_clicks = self.bid_to_clicks(bid, user_class)
