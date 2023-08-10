@@ -13,6 +13,7 @@ class NSEnvironment(Environment):
         n_phases = len(self.phases_probabilities)
         self.phases_size = self.horizon / n_phases
         self.arms_mean = [minmax_scale((self.phases_probabilities[i] * self.prices), axis=1) for i in range(3)]
+
     @classmethod
     def from_json(cls, json_path: str):
         with open(json_path) as f:
@@ -39,8 +40,6 @@ class NSEnvironment(Environment):
             case 2:
                 features[0] = 1
                 features[1] = 1
-        print('phase: ',current_phase)
-        print(f'arms_mean:{self.arms_mean[extracted_class][current_phase][pulled_arm]}')
         # minmax scale may compute a rounding error giving an arms_mean value slightly higher than 1 which causes an error when computing reward
         if self.arms_mean[extracted_class][current_phase][pulled_arm] >= 1.:
             self.arms_mean[extracted_class][current_phase][pulled_arm] = 1
