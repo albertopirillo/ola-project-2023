@@ -77,7 +77,7 @@ def run_experiment(_):
 
 if __name__ == '__main__':
     # Run the experiments in parallel
-    results_list = process_map(run_experiment, range(n_experiments), max_workers=12, chunksize=1)
+    results_list = process_map(run_experiment, range(n_experiments), max_workers=10, chunksize=1)
     # Array of shape (n_experiments, 6, T)
     results_array = np.array(results_list)
 

@@ -66,7 +66,7 @@ def run_experiment(_):
 
 if __name__ == '__main__':
     # Run the experiments in parallel
-    results_list = process_map(run_experiment, range(n_experiments), max_workers=12, chunksize=1)
+    results_list = process_map(run_experiment, range(n_experiments), max_workers=10, chunksize=1)
     # Array of shape (n_experiments, 6, T)
     results_array = np.array(results_list)
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 
     # Generate plots of the mean and standard deviation of the results
     plot_statistics(inst_reward_clairvoyant, inst_regret_clairvoyant, 'Clairvoyant', 'Step 2')
-    plot_statistics(inst_reward_ucb1, inst_regret_ucb1, 'UCB1', 'Step 2')
-    plot_statistics(inst_reward_ts, inst_regret_ts, 'TS', 'Step 2')
+    plot_statistics(inst_reward_ucb1, inst_regret_ucb1, 'GP-UCB', 'Step 2')
+    plot_statistics(inst_reward_ts, inst_regret_ts, 'GP-TS', 'Step 2')
     plt.tight_layout()
     plt.show()
