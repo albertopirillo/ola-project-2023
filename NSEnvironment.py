@@ -12,7 +12,7 @@ class NSEnvironment(Environment):
         self.horizon = horizon
         n_phases = len(self.phases_probabilities)
         self.phases_size = self.horizon / n_phases
-        self.arms_mean = [minmax_scale((self.phases_probabilities[i] * self.prices), axis=1) for i in range(3)]
+        self.arms_mean = [minmax_scale((self.phases_probabilities[i] * self.prices), axis=1) for i in range(n_phases)]
 
     @classmethod
     def from_json(cls, json_path: str):
