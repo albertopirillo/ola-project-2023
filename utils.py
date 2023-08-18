@@ -61,3 +61,5 @@ def plot_statistics(instantaneous_rewards: np.ndarray[float], instantaneous_regr
     plot_with_std(1, 'Instantaneous regret', legend_label, title, i_regret_mean, i_regret_std)
     plot_with_std(2, 'Cumulative reward', legend_label, title, c_reward_mean, c_reward_std)
     plot_with_std(3, 'Cumulative regret', legend_label, title, c_regret_mean, c_regret_std)
+
+

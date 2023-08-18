@@ -21,7 +21,7 @@ alpha = 0.01
 
 def run_experiment(_):
     # For every experiment, we define new environment and learners
-    env = NSEnvironment.from_json('data/NSenvironment2.json')
+    env = NSEnvironment.from_json('data/NSenvironment_step6_1.json')
     # Clairvoyant
     clairvoyant = NSClairvoyantAlgorithm(env)
     # Learners
