@@ -41,11 +41,11 @@ class NSEnvironment(Environment):
                 features[0] = 1
                 features[1] = 1
         # minmax scale may compute a rounding error giving an arms_mean value slightly higher than 1 which causes an error when computing reward
-        if self.arms_mean[extracted_class][current_phase][pulled_arm] >= 1.:
-            self.arms_mean[extracted_class][current_phase][pulled_arm] = 1
-        reward: int = np.random.binomial(1, self.arms_mean[extracted_class][current_phase][pulled_arm])
+        if self.arms_mean[current_phase][extracted_class][pulled_arm] >= 1.:
+            self.arms_mean[current_phase][extracted_class][pulled_arm] = 1
+        reward: int = np.random.binomial(1, self.arms_mean[current_phase][extracted_class][pulled_arm])
         return reward
-    
+
     def compute_reward(self, price_index: int, bid_index: int, user_class: int, phase: int) -> float:
         """
         Compute the reward using the true values from the environment.
@@ -54,7 +54,7 @@ class NSEnvironment(Environment):
         :param user_class: the class of the current user
         :return:
         """
-        conv_rate = self.phases_probabilities[user_class][phase][price_index]
+        conv_rate = self.phases_probabilities[phase][user_class][price_index]
         price = self.prices[price_index]
         cost = 0.0
         bid = self.bids[bid_index]

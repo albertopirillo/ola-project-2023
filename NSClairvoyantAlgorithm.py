@@ -19,8 +19,8 @@ class NSClairvoyantAlgorithm:
             num_phases = len(self.environment.phases_probabilities)
             for phase in range(num_phases):
                 # Find the best price which requires considering both the conversion rate, and the actual price
-                best_arm_id: int = int(np.argmax(self.environment.arms_mean[user_class][phase]))            ##TODO: CHECK SE NON SONO INVERSI!!!!
-                best_conv_rate: float = self.environment.phases_probabilities[user_class][phase][best_arm_id]
+                best_arm_id: int = int(np.argmax(self.environment.arms_mean[phase][user_class]))
+                best_conv_rate: float = self.environment.phases_probabilities[phase][user_class][best_arm_id]
                 best_price: float = self.environment.prices[best_arm_id]
 
                 # Optimize the reward w.r.t. the bid for each class independently
