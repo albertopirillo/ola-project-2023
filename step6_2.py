@@ -24,7 +24,7 @@ alpha = 0.01
 
 def run_experiment(_):
     # For every experiment, we define new environment and learners
-    env = NSEnvironment.from_json('data/NSenvironment.json')
+    env = NSEnvironment.from_json('data/NSenvironment_step6_2.json')
 
     # Clairvoyant
     clairvoyant = NSClairvoyantAlgorithm(env)
@@ -33,7 +33,6 @@ def run_experiment(_):
     swucb_learner = SWUCB1Learner(len(env.prices), windows_size=windows_size)
     cducb_learner = CDUCBLearner(len(env.prices), M, eps, h, alpha)
     exp3_learner = EXP3Learner(len(env.prices))
-
 
     # Data structures
     instantaneous_reward_clairvoyant = np.zeros(T)
@@ -50,7 +49,7 @@ def run_experiment(_):
 
     for t in range(T):
         # Clairvoyant algorithm
-        current_phase = int(t / clairvoyant.environment.phases_size)
+        current_phase = (t // env.phase_length) % env.n_phases
         opt_reward = clairvoyant.optimal_rewards[current_phase]
         opt_bid_id = clairvoyant.optimal_bids_id[current_phase]
 

@@ -89,10 +89,10 @@ def run_experiment(_):
 if __name__ == '__main__':
     # Run the experiments in parallel
     results_list = process_map(run_experiment, range(n_experiments), max_workers=10, chunksize=1)
-    # Array of shape (n_experiments, 6, T)
+    # Array of shape (n_experiments, 8, T)
     results_array = np.array(results_list)
 
-    # Extract the results into six arrays of shape (n_experiments, T)
+    # Extract the results into eight arrays of shape (n_experiments, T)
     inst_reward_clairvoyant = results_array[:, 0, :]
     inst_reward_ucb1 = results_array[:, 1, :]
     inst_reward_swucb = results_array[:, 2, :]

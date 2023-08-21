@@ -1,8 +1,5 @@
 import numpy as np
 from Learner import Learner
-import math
-import pandas as pd
-from numpy.random import choice
 
 
 class EXP3Learner(Learner):
@@ -13,34 +10,17 @@ class EXP3Learner(Learner):
         self.gamma = 0.5
         self.probabilities = np.zeros(n_arms)
 
-    def draw(self,w):
-        choice = np.random.uniform(0, sum(w))
-        choiceIndex = 0
-
-        for weight in w:
-            choice -= weight
-            #print("choice:", choice)
-            #print("weight: ", weight)
-            if choice <= 0:
-                return choiceIndex
-
-            choiceIndex += 1
+    def draw(self):
+        return np.random.choice(np.arange(self.n_arms), size=1, p=self.probabilities)
 
     def pull_arm(self):
         weight_sum = float(sum(self.weights))
         for w in range(len(self.weights)):
             self.probabilities[w] = ((1.0 - self.gamma) * (self.weights[w] / weight_sum) + (self.gamma / self.n_arms))
-        #print("probabilities: ", self.probabilities)
-        index = self.draw(self.probabilities)
+        index = self.draw()
         return index
 
     def update(self, pulled_arm, reward):
         self.t += 1
-        for a in range(self.n_arms):
-            if a == pulled_arm:
-                #print("aggiorno indice: ",a)
-                self.estimated_reward[a] = reward / self.probabilities[a]
-                self.weights[a] *= math.exp(self.estimated_reward[a] * self.gamma / self.n_arms)
-            else:
-                self.estimated_reward[a] = 0
-        #print("weights", self.weights)
+        self.estimated_reward[pulled_arm] = reward / self.probabilities[pulled_arm]
+        self.weights[pulled_arm] *= np.exp(self.estimated_reward[pulled_arm] * self.gamma / self.n_arms)

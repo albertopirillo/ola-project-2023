@@ -105,7 +105,6 @@ class Environment:
         :param conv_rate: the conversion rate of the product
         :param price: the price of the product
         :param cost: the cost to the company of the product
-        :param bid: the bid
         :param daily_clicks: the number of daily clicks
         :param daily_cost: the cumulative daily cost due to advertising
         :return:

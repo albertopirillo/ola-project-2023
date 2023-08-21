@@ -3,16 +3,18 @@ from Environment import Environment
 import numpy as np
 from sklearn.preprocessing import minmax_scale
 
+
 class NSEnvironment(Environment):
     def __init__(self, num_classes: int, bids: np.ndarray[float], prices: np.ndarray[float], noise_mean: float,
-            noise_std: float, conv_rates: np.ndarray[float], class_probabilities: np.ndarray[float],
-            phases_probabilities: np.ndarray[float], horizon: int) -> None:
+                 noise_std: float, conv_rates: np.ndarray[float], class_probabilities: np.ndarray[float],
+                 phases_probabilities: np.ndarray[float], horizon: int, phase_length: int) -> None:
         super().__init__(num_classes, bids, prices, noise_mean, noise_std, conv_rates, class_probabilities)
         self.phases_probabilities = phases_probabilities
         self.horizon = horizon
-        n_phases = len(self.phases_probabilities)
-        self.phases_size = self.horizon / n_phases
-        self.arms_mean = [minmax_scale((self.phases_probabilities[i] * self.prices), axis=1) for i in range(n_phases)]
+        self.phase_length = phase_length
+        self.n_phases = len(self.phases_probabilities)
+        self.phases_size = self.horizon / self.n_phases
+        self.arms_mean = [minmax_scale((self.phases_probabilities[i] * self.prices), axis=1) for i in range(self.n_phases)]
 
     @classmethod
     def from_json(cls, json_path: str):
@@ -28,8 +30,9 @@ class NSEnvironment(Environment):
 
     def round(self, pulled_arm, t):
         extracted_class: int = np.random.choice(self.num_classes, p=self.class_probabilities)
-        current_phase = int(t / self.phases_size)
+        current_phase = (t // self.phase_length) % self.n_phases
         features: np.ndarray[int] = np.zeros(2)
+
         match extracted_class:
             case 0:
                 features[0] = 0
@@ -40,7 +43,9 @@ class NSEnvironment(Environment):
             case 2:
                 features[0] = 1
                 features[1] = 1
-        # minmax scale may compute a rounding error giving an arms_mean value slightly higher than 1 which causes an error when computing reward
+
+        # minmax scale may compute a rounding error giving an arms_mean value
+        # slightly higher than 1 which causes an error when computing reward
         if self.arms_mean[current_phase][extracted_class][pulled_arm] >= 1.:
             self.arms_mean[current_phase][extracted_class][pulled_arm] = 1
         reward: int = np.random.binomial(1, self.arms_mean[current_phase][extracted_class][pulled_arm])
@@ -60,21 +65,5 @@ class NSEnvironment(Environment):
         bid = self.bids[bid_index]
         daily_clicks = self.bid_to_clicks(bid, user_class)
         daily_cost = self.bid_to_daily_cost(bid, user_class)
-        return self.actual_reward(conv_rate, price, cost, daily_clicks, daily_cost)
+        return super().actual_reward(conv_rate, price, cost, daily_clicks, daily_cost)
 
-    @staticmethod
-    def actual_reward(conv_rate: float, price: float, cost: float, daily_clicks: float, daily_cost: float) -> float:
-        """
-        Performs the actual computation of the reward given the parameters passed by the other functions.
-        The reward is given by: (daily_clicks * conv_rate * margin) - cumulative_daily_cost
-        The margin is given by the price minus the cost.
-        This method should never be called directly.
-        :param conv_rate: the conversion rate of the product
-        :param price: the price of the product
-        :param cost: the cost to the company of the product
-        :param bid: the bid
-        :param daily_clicks: the number of daily clicks
-        :param daily_cost: the cumulative daily cost due to advertising
-        :return:
-        """
-        return (daily_clicks * conv_rate * (price - cost)) - daily_cost
