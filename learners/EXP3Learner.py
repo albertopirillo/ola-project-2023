@@ -3,11 +3,11 @@ from learners.Learner import Learner
 
 
 class EXP3Learner(Learner):
-    def __init__(self, n_arms):
+    def __init__(self, n_arms, gamma):
         super().__init__(n_arms)
         self.weights = np.ones(n_arms)
         self.estimated_reward = np.zeros(n_arms)
-        self.gamma = 0.5
+        self.gamma = gamma
         self.probabilities = np.zeros(n_arms)
 
     def draw(self):

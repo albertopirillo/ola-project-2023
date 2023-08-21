@@ -19,6 +19,9 @@ eps = 0.05
 h = 20
 alpha = 0.01
 
+# EXP3 parameter
+gamma = 0.5
+
 
 def run_experiment(_):
     # For every experiment, we define new environment and learners
@@ -26,7 +29,7 @@ def run_experiment(_):
     # Clairvoyant
     clairvoyant = NSClairvoyantAlgorithm(env)
     # Learners
-    exp3_learner = EXP3Learner(len(env.prices))
+    exp3_learner = EXP3Learner(len(env.prices), gamma)
     swucb_learner = SWUCB1Learner(len(env.prices), windows_size=windows_size)
     cducb_learner = CDUCBLearner(len(env.prices), M, eps, h, alpha)
 
