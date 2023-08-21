@@ -43,3 +43,7 @@ class GPUCBLearner(Learner):
     def pull_arm(self) -> int:
         sampled_value = int(np.argmax(self.means + self.sigmas * self.beta))
         return sampled_value
+
+    def get_best_expected_value(self) -> float:
+        best = np.max(self.means)
+        return best

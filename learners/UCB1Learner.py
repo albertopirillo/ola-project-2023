@@ -23,3 +23,7 @@ class UCB1Learner(Learner):
             n_samples = len(self.rewards_per_arm[a])
             self.confidence[a] = (2 * np.log(self.t) / n_samples) ** 0.5 if n_samples > 0 else np.inf
         self.update_observations(pull_arm, reward)
+
+    def get_best_expected_value(self) -> int:
+        best = int(np.max(self.empirical_means))
+        return best

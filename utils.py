@@ -34,7 +34,7 @@ def plot_with_std(figure_id: int, y_label: str, curve_label: str, title: str,
     :param values_std: a 1D array of shape (num_time_instants) containing the std of the values
     :return:
     """
-    plt.figure(figure_id)
+    plt.figure(figure_id, figsize=(16, 8))
     plt.xlabel('t')
     plt.ylabel(y_label)
     plt.plot(values_mean, label=curve_label)
@@ -63,3 +63,5 @@ def plot_statistics(instantaneous_rewards: np.ndarray[float], instantaneous_regr
     plot_with_std(3, 'Cumulative regret', legend_label, title, c_regret_mean, c_regret_std)
 
 
+def hoeffding_bound(empiric_mean: float, confidence: float, z: int) -> float:
+    return empiric_mean - np.sqrt(-(np.log(confidence)) / (2 * z))

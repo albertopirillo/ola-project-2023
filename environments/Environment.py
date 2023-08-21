@@ -28,7 +28,7 @@ class Environment:
         data['class_probabilities'] = np.array(data['class_probabilities'])
         return cls(**data)
 
-    def round(self, arm_index) -> int:
+    def round(self, arm_index: int) -> int:
         extracted_class: int = np.random.choice(self.num_classes, p=self.class_probabilities)
         features: np.ndarray[int] = np.zeros(2)
         match extracted_class:
@@ -42,6 +42,10 @@ class Environment:
                 features[0] = 1
                 features[1] = 1
 
+        reward: int = np.random.binomial(1, self.arms_mean[extracted_class][arm_index])
+        return reward
+
+    def round_step4(self, arm_index: int, extracted_class: int) -> int:
         reward: int = np.random.binomial(1, self.arms_mean[extracted_class][arm_index])
         return reward
 
