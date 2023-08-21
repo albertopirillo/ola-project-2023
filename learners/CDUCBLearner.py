@@ -1,9 +1,10 @@
-from UCB1Learner import UCB1Learner
+from learners.UCB1Learner import UCB1Learner
+from learners.CUSUM import CUSUM
 import numpy as np
-from CUSUM import CUSUM
+
 
 class CDUCBLearner(UCB1Learner):
-    def __init__(self, n_arms, M=100, eps = 0.05, h = 20, alpha = 0.01):
+    def __init__(self, n_arms, M=100, eps=0.05, h=20, alpha=0.01):
         super().__init__(n_arms)
         self.change_detection = [CUSUM(M, eps, h) for _ in range(n_arms)]
         self.valid_rewards_per_arms = [[] for _ in range(n_arms)]
@@ -11,13 +12,14 @@ class CDUCBLearner(UCB1Learner):
         self.alpha = alpha
 
     def pull_arm(self):
-        if np.random.binomial(1, 1-self.alpha):                     #with probability 1-alpha select the arm with the highest upper confidence bound
+        # with probability 1-alpha select the arm with the highest upper confidence bound
+        if np.random.binomial(1, 1 - self.alpha):
             upper_conf = self.empirical_means + self.confidence
             upper_conf[np.isinf(upper_conf)] = 1e3
             return np.random.choice(np.where(upper_conf == upper_conf.max())[0])
         else:
-            return np.random.choice(self.n_arms)                #with probability alpha pull a random arm
-        
+            return np.random.choice(self.n_arms)  # with probability alpha pull a random arm
+
     def update(self, pulled_arm, reward):
         self.t += 1
         if self.change_detection[pulled_arm].update(reward):

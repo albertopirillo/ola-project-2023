@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.contrib.concurrent import process_map
 
-from NSClairvoyantAlgorithm import NSClairvoyantAlgorithm
-from NSEnvironment import NSEnvironment
-from SWUCB1Learner import SWUCB1Learner
-from CDUCBLearner import CDUCBLearner
-from UCB1Learner import UCB1Learner
-from EXP3Learner import EXP3Learner
+from environments.NSClairvoyantAlgorithm import NSClairvoyantAlgorithm
+from environments.NSEnvironment import NSEnvironment
+from learners.SWUCB1Learner import SWUCB1Learner
+from learners.CDUCBLearner import CDUCBLearner
+from learners.UCB1Learner import UCB1Learner
+from learners.EXP3Learner import EXP3Learner
 from utils import plot_statistics
 
 # Simulation parameters

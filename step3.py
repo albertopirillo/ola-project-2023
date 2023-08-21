@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.contrib.concurrent import process_map
 
-from ClairvoyantAlgorithm import ClairvoyantAlgorithm
-from Environment import Environment
-from GPTSLearner import GPTSLearner
-from GPUCBLearner import GPUCBLearner
-from TSLearner import TSLearner
-from UCB1Learner import UCB1Learner
+from environments.ClairvoyantAlgorithm import ClairvoyantAlgorithm
+from environments.Environment import Environment
+from learners.GPTSLearner import GPTSLearner
+from learners.GPUCBLearner import GPUCBLearner
+from learners.TSLearner import TSLearner
+from learners.UCB1Learner import UCB1Learner
 from utils import plot_statistics
 
 import warnings

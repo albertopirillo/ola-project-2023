@@ -2,22 +2,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.contrib.concurrent import process_map
 
-from ClairvoyantAlgorithm import ClairvoyantAlgorithm
-from Environment_step4 import Environment
-from GPTSLearner import GPTSLearner
-from GPUCBLearner import GPUCBLearner
-from TSLearner import TSLearner
-from UCB1Learner import UCB1Learner
+from environments.ClairvoyantAlgorithm import ClairvoyantAlgorithm
+from environments.Environment_step4 import Environment
+from learners.GPTSLearner import GPTSLearner
+from learners.GPUCBLearner import GPUCBLearner
+from learners.TSLearner import TSLearner
+from learners.UCB1Learner import UCB1Learner
 from utils import plot_statistics
 
 import warnings
 from sklearn.exceptions import ConvergenceWarning
+
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 # Simulation parameters
-T = 100
-n_experiments = 3
-
+T = 125
+n_experiments = 10
 
 
 def run_experiment(_):
@@ -81,16 +81,20 @@ def run_experiment(_):
     instantaneous_regret_ucb1 = np.zeros(T)
     instantaneous_regret_ts = np.zeros(T)
 
-    #Simulation of the choice of the contexts
-    d = 1
-
+    # Simulation of the choice of the contexts
+    # 1: context of 4 classes
+    # -1: context of 2 classes split on feature 1
+    # 0: context of 2 classes split on feature 0
+    # -2: context of 1 class
+    choice_of_context = 1
+    week = 7
 
     for t in range(T):
-        if (t == 56):
-            d = 1  #TODO Implement
+        if (t == week * 6):
+            d = 1  # TODO Implement
 
-        if (t == 42):
-            d = 1  #TODO Implement
+        if (t == week * 8):
+            d = 1  # TODO Implement
         extracted_class: int = np.random.choice(env.num_classes, p=env.class_probabilities)
         features: np.ndarray[int] = np.zeros(2)
         match extracted_class:
@@ -109,11 +113,11 @@ def run_experiment(_):
         instantaneous_reward_clairvoyant[t] = opt_reward
         instantaneous_regret_clairvoyant[t] = 0
 
-        if (t < 14 or d == -2):
+        if (t < week * 2 or choice_of_context == -2):
 
             # UCB1 and GP-UCB learners
             pulled_arm_pricing = ucb1_learner.pull_arm()
-            pricing_reward = env.round(pulled_arm_pricing,extracted_class)
+            pricing_reward = env.round(pulled_arm_pricing, extracted_class)
             ucb1_learner.update(pulled_arm_pricing, pricing_reward)
 
             pulled_arm_advertising = gp_ucb_learner.pull_arm()
@@ -126,7 +130,7 @@ def run_experiment(_):
 
             # TS and GP-TS learners
             pulled_arm_pricing = ts_learner.pull_arm()
-            pricing_reward = env.round(pulled_arm_pricing,extracted_class)
+            pricing_reward = env.round(pulled_arm_pricing, extracted_class)
             ts_learner.update(pulled_arm_pricing, pricing_reward)
 
             pulled_arm_advertising = gp_ts_learner.pull_arm()
@@ -137,14 +141,15 @@ def run_experiment(_):
             regret = opt_reward - total_reward
             instantaneous_regret_ts[t] = regret
 
-        elif((t >= 14 and t < 28) or d==-1):
+        elif ((t >= week * 2 and t < week * 4) or choice_of_context == -1):
             # UCB1 and GP-UCB learners
             if (features[0] == 0):
                 pulled_arm_pricing = ucb1_learner_feature1_0.pull_arm()
                 pricing_reward = env.round(pulled_arm_pricing, extracted_class)
                 ucb1_learner_feature1_0.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ucb_learner_feature1_0.pull_arm()
-                total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=extracted_class)
+                total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
+                                                  user_class=extracted_class)
                 gp_ucb_learner_feature1_0.update(pulled_arm_advertising, total_reward)
 
             else:
@@ -152,7 +157,8 @@ def run_experiment(_):
                 pricing_reward = env.round(pulled_arm_pricing, extracted_class)
                 ucb1_learner_feature1_1.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ucb_learner_feature1_1.pull_arm()
-                total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=extracted_class)
+                total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
+                                                  user_class=extracted_class)
                 gp_ucb_learner_feature1_1.update(pulled_arm_advertising, total_reward)
 
             instantaneous_reward_ucb1[t] = total_reward
@@ -161,11 +167,12 @@ def run_experiment(_):
 
             # TS and GP-TS learners
             if (features[0] == 0):
-                pulled_arm_pricing =  ts_learner_feature1_0.pull_arm()
+                pulled_arm_pricing = ts_learner_feature1_0.pull_arm()
                 pricing_reward = env.round(pulled_arm_pricing, extracted_class)
                 ts_learner_feature1_0.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_feature1_0.pull_arm()
-                total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=extracted_class)
+                total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
+                                                  user_class=extracted_class)
                 gp_ts_learner_feature1_0.update(pulled_arm_advertising, total_reward)
 
             else:
@@ -173,14 +180,15 @@ def run_experiment(_):
                 pricing_reward = env.round(pulled_arm_pricing, extracted_class)
                 ts_learner_feature1_1.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_feature1_1.pull_arm()
-                total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=extracted_class)
+                total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
+                                                  user_class=extracted_class)
                 gp_ts_learner_feature1_1.update(pulled_arm_advertising, total_reward)
 
             instantaneous_reward_ts[t] = total_reward
             regret = opt_reward - total_reward
             instantaneous_regret_ts[t] = regret
 
-        elif ((t >= 28  and t < 42) or d == 0):
+        elif ((t >= week * 4 and t < week * 6) or choice_of_context == 0):
             # UCB1 and GP-UCB learners
             if (features[1] == 0):
                 pulled_arm_pricing = ucb1_learner_feature2_0.pull_arm()
@@ -226,9 +234,9 @@ def run_experiment(_):
             regret = opt_reward - total_reward
             instantaneous_regret_ts[t] = regret
 
-        elif ((t >= 42 and t < 56) or d == 1):
+        elif ((t >= week * 6 and t < week * 8) or choice_of_context == 1):
             # UCB1 and GP-UCB learners
-            if (features[1] == 0 and features[0]== 1):
+            if (features[1] == 0 and features[0] == 1):
                 pulled_arm_pricing = ucb1_learner_c1.pull_arm()
                 pricing_reward = env.round(pulled_arm_pricing, extracted_class)
                 ucb1_learner_c1.update(pulled_arm_pricing, pricing_reward)
@@ -277,7 +285,7 @@ def run_experiment(_):
                 total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
                                                   user_class=extracted_class)
                 gp_ts_learner_c1.update(pulled_arm_advertising, total_reward)
-            elif(features[1] == 0 and features[0] == 0):
+            elif (features[1] == 0 and features[0] == 0):
                 pulled_arm_pricing = ts_learner_c2.pull_arm()
                 pricing_reward = env.round(pulled_arm_pricing, extracted_class)
                 ts_learner_c2.update(pulled_arm_pricing, pricing_reward)
@@ -305,8 +313,6 @@ def run_experiment(_):
             instantaneous_reward_ts[t] = total_reward
             regret = opt_reward - total_reward
             instantaneous_regret_ts[t] = regret
-
-
 
     return instantaneous_reward_clairvoyant, instantaneous_reward_ucb1, instantaneous_reward_ts, \
         instantaneous_regret_clairvoyant, instantaneous_regret_ucb1, instantaneous_regret_ts

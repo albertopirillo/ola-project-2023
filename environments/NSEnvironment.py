@@ -1,5 +1,5 @@
 import json
-from Environment import Environment
+from environments.Environment import Environment
 import numpy as np
 from sklearn.preprocessing import minmax_scale
 

@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.contrib.concurrent import process_map
 
-from ClairvoyantAlgorithm import ClairvoyantAlgorithm
-from Environment_step4 import (Environment)
-from GPTSLearner import GPTSLearner
-from GPUCBLearner import GPUCBLearner
-from TSLearner import TSLearner
-from UCB1Learner import UCB1Learner
+from environments.ClairvoyantAlgorithm import ClairvoyantAlgorithm
+from environments.Environment_step4 import (Environment)
+from learners.GPTSLearner import GPTSLearner
+from learners.GPUCBLearner import GPUCBLearner
+from learners.TSLearner import TSLearner
+from learners.UCB1Learner import UCB1Learner
 from utils import plot_statistics
 
 import warnings
@@ -35,14 +35,14 @@ def run_experiment(_):
     gp_ucb_learner2 = GPUCBLearner(len(env.bids), env.bids)
     gp_ts_learner2 = GPTSLearner(len(env.bids), env.bids)
 
-    ucb1_learner3= UCB1Learner(len(env.prices))
+    ucb1_learner3 = UCB1Learner(len(env.prices))
     ts_learner3 = TSLearner(len(env.prices))
     gp_ucb_learner3 = GPUCBLearner(len(env.bids), env.bids)
     gp_ts_learner3 = GPTSLearner(len(env.bids), env.bids)
 
     # Data structures
     instantaneous_reward_clairvoyant = np.zeros(T)
-    instantaneous_reward_ucb1= np.zeros(T)
+    instantaneous_reward_ucb1 = np.zeros(T)
     instantaneous_reward_ts = np.zeros(T)
 
     instantaneous_regret_clairvoyant = np.zeros(T)

@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.contrib.concurrent import process_map
 
-from ClairvoyantAlgorithm import ClairvoyantAlgorithm
-from Environment import Environment
-from GPTSLearner import GPTSLearner
-from GPUCBLearner import GPUCBLearner
+from environments.ClairvoyantAlgorithm import ClairvoyantAlgorithm
+from environments.Environment import Environment
+from learners.GPTSLearner import GPTSLearner
+from learners.GPUCBLearner import GPUCBLearner
 from utils import plot_statistics
 
 import warnings

@@ -1,6 +1,6 @@
 import numpy as np
 import logging
-from Environment import Environment
+from environments.Environment import Environment
 
 
 class ClairvoyantAlgorithm:

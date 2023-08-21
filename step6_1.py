@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from tqdm.contrib.concurrent import process_map
-from EXP3Learner import EXP3Learner
-from SWUCB1Learner import SWUCB1Learner
-from CDUCBLearner import CDUCBLearner
-from NSClairvoyantAlgorithm import NSClairvoyantAlgorithm
-from NSEnvironment import NSEnvironment
+from learners.EXP3Learner import EXP3Learner
+from learners.SWUCB1Learner import SWUCB1Learner
+from learners.CDUCBLearner import CDUCBLearner
+from environments.NSClairvoyantAlgorithm import NSClairvoyantAlgorithm
+from environments.NSEnvironment import NSEnvironment
 from utils import plot_statistics
 
 # Simulation parameters
@@ -18,6 +18,7 @@ M = 20
 eps = 0.05
 h = 20
 alpha = 0.01
+
 
 def run_experiment(_):
     # For every experiment, we define new environment and learners
@@ -39,7 +40,6 @@ def run_experiment(_):
     instantaneous_regret_exp3 = np.zeros(T)
     instantaneous_regret_swucb = np.zeros(T)
     instantaneous_regret_cducb = np.zeros(T)
-
 
     for t in range(T):
         # Clairvoyant algorithm
@@ -80,7 +80,7 @@ def run_experiment(_):
         regret = opt_reward - total_reward
         instantaneous_regret_cducb[t] = regret
 
-    return instantaneous_reward_clairvoyant, instantaneous_reward_exp3,  \
+    return instantaneous_reward_clairvoyant, instantaneous_reward_exp3, \
         instantaneous_reward_swucb, instantaneous_reward_cducb, instantaneous_regret_clairvoyant, \
         instantaneous_regret_exp3, instantaneous_regret_swucb, instantaneous_regret_cducb
 
