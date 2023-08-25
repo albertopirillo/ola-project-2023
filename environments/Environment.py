@@ -15,7 +15,11 @@ class Environment:
         self.conv_rates = conv_rates  # matrix containing bernoulli distributions of the arms for the prices
         self.class_probabilities = class_probabilities  # distributions of the classes
         # When learning, consider the [0,1]-normalized conv_rates * prices
-        self.arms_mean = minmax_scale((self.conv_rates * self.prices), axis=1)
+        if len(self.conv_rates.shape) == 2:
+            self.arms_mean = minmax_scale((self.conv_rates * self.prices), axis=1)
+        else:
+            self.arms_mean = [minmax_scale((self.conv_rates[i] * self.prices), axis=1) for i in
+                              range(self.conv_rates.shape[0])]
 
     @classmethod
     def from_json(cls, json_path: str) -> Self:

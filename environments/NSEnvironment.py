@@ -1,32 +1,16 @@
-import json
-from environments.Environment import Environment
 import numpy as np
-from sklearn.preprocessing import minmax_scale
+from environments.Environment import Environment
 
 
 class NSEnvironment(Environment):
     def __init__(self, num_classes: int, bids: np.ndarray[float], prices: np.ndarray[float], noise_mean: float,
                  noise_std: float, conv_rates: np.ndarray[float], class_probabilities: np.ndarray[float],
-                 phases_probabilities: np.ndarray[float], horizon: int, phase_length: int) -> None:
+                 horizon: int, phase_length: int) -> None:
         super().__init__(num_classes, bids, prices, noise_mean, noise_std, conv_rates, class_probabilities)
-        self.phases_probabilities = phases_probabilities
         self.horizon = horizon
         self.phase_length = phase_length
-        self.n_phases = len(self.phases_probabilities)
+        self.n_phases = self.conv_rates.shape[0]
         self.phases_size = self.horizon / self.n_phases
-        self.arms_mean = [minmax_scale((self.phases_probabilities[i] * self.prices), axis=1) for i in range(self.n_phases)]
-
-    @classmethod
-    def from_json(cls, json_path: str):
-        with open(json_path) as f:
-            data = json.load(f)
-        # Convert from JSON arrays to Numpy arrays
-        data['bids'] = np.linspace(*data['bids'])
-        data['prices'] = np.array(data['prices'])
-        data['conv_rates'] = np.array(data['conv_rates'])
-        data['class_probabilities'] = np.array(data['class_probabilities'])
-        data['phases_probabilities'] = np.array(data['phases_probabilities'])
-        return cls(**data)
 
     def round(self, pulled_arm, t):
         extracted_class: int = np.random.choice(self.num_classes, p=self.class_probabilities)
@@ -57,13 +41,13 @@ class NSEnvironment(Environment):
         :param price_index: the index of the chosen price
         :param bid_index: the index of the chosen bid
         :param user_class: the class of the current user
+        :param phase: the current phase of the non-stationary environment
         :return:
         """
-        conv_rate = self.phases_probabilities[phase][user_class][price_index]
+        conv_rate = self.conv_rates[phase][user_class][price_index]
         price = self.prices[price_index]
         cost = 0.0
         bid = self.bids[bid_index]
         daily_clicks = self.bid_to_clicks(bid, user_class)
         daily_cost = self.bid_to_daily_cost(bid, user_class)
         return super().actual_reward(conv_rate, price, cost, daily_clicks, daily_cost)
-
