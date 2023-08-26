@@ -20,7 +20,7 @@ h = 20
 alpha = 0.01
 
 # EXP3 parameter
-gamma = 0.2
+gamma = 0.01
 
 
 def run_experiment(_):
@@ -55,8 +55,8 @@ def run_experiment(_):
 
         # EXP3 learner
         pulled_arm = exp3_learner.pull_arm()
-        pricing_reward = env.round(pulled_arm, exp3_learner.t)
-        exp3_learner.update(pulled_arm, pricing_reward)
+        bernoulli_reward = env.round(pulled_arm, exp3_learner.t)
+        exp3_learner.update(pulled_arm, bernoulli_reward * env.prices[pulled_arm])
 
         total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0, phase=current_phase)
         instantaneous_reward_exp3[t] = total_reward
