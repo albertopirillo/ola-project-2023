@@ -3,12 +3,14 @@ import numpy as np
 
 
 class SWUCB1Learner(UCB1Learner):
-    def __init__(self, n_arms, windows_size):
+    def __init__(self, n_arms: int, windows_size: int) -> None:
         super().__init__(n_arms)
         self.windows_size = windows_size
         self.pulled_arms = np.array([])
+        # Hyperparameter that controls the exploration-exploitation tradeoff
+        self.beta = 90.8
 
-    def update(self, pulled_arm, reward):
+    def update(self, pulled_arm: int, reward: float) -> None:
         self.t += 1
         self.pulled_arms = np.append(self.pulled_arms, pulled_arm)
         n_pulled_arm = np.sum(self.pulled_arms[-self.windows_size:] == pulled_arm)

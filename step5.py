@@ -10,9 +10,9 @@ from learners.UCB1Learner import UCB1Learner
 from utils import plot_statistics
 
 # Simulation parameters
-T = 360  # n.b.: T must be equal to horizon parameter in the JSON file
+T = 365  # n.b.: T must be equal to horizon parameter in the JSON file
 n_experiments = 1000
-windows_size = int(100)
+window_size = 100
 
 # CUSUM parameters
 M = 20
@@ -23,12 +23,12 @@ alpha = 0.01
 
 def run_experiment(_):
     # For every experiment, we define new environment and learners
-    env = NSEnvironment.from_json('data/NSenvironment.json')
+    env = NSEnvironment.from_json('data/NS_environment.json')
     # Clairvoyant
     clairvoyant = NSClairvoyantAlgorithm(env)
     # Learners
     ucb1_learner = UCB1Learner(len(env.prices))
-    swucb_learner = SWUCB1Learner(len(env.prices), windows_size=windows_size)
+    swucb_learner = SWUCB1Learner(len(env.prices), windows_size=window_size)
     cducb_learner = CDUCBLearner(len(env.prices), M, eps, h, alpha)
 
     # Data structures
@@ -53,28 +53,28 @@ def run_experiment(_):
 
         # UCB1 learner
         pulled_arm = ucb1_learner.pull_arm()
-        pricing_reward = env.round(pulled_arm, ucb1_learner.t)
-        ucb1_learner.update(pulled_arm, pricing_reward)
+        bernoulli_reward = env.round(pulled_arm, ucb1_learner.t)
+        ucb1_learner.update(pulled_arm, bernoulli_reward * env.prices[pulled_arm])
 
         total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0, phase=current_phase)
         instantaneous_reward_ucb1[t] = total_reward
         regret = opt_reward - total_reward
         instantaneous_regret_ucb1[t] = regret
 
-        # SWUCB learner
+        # SW-UCB learner
         pulled_arm = swucb_learner.pull_arm()
-        pricing_reward = env.round(pulled_arm, swucb_learner.t)
-        swucb_learner.update(pulled_arm, pricing_reward)
+        bernoulli_reward = env.round(pulled_arm, swucb_learner.t)
+        swucb_learner.update(pulled_arm, bernoulli_reward * env.prices[pulled_arm])
 
         total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0, phase=current_phase)
         instantaneous_reward_swucb[t] = total_reward
         regret = opt_reward - total_reward
         instantaneous_regret_swucb[t] = regret
 
-        # CDUCB learner
+        # CD-UCB learner
         pulled_arm = cducb_learner.pull_arm()
-        pricing_reward = env.round(pulled_arm, cducb_learner.t)
-        cducb_learner.update(pulled_arm, pricing_reward)
+        bernoulli_reward = env.round(pulled_arm, cducb_learner.t)
+        cducb_learner.update(pulled_arm, bernoulli_reward * env.prices[pulled_arm])
 
         total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0, phase=current_phase)
         instantaneous_reward_cducb[t] = total_reward
@@ -89,10 +89,10 @@ def run_experiment(_):
 if __name__ == '__main__':
     # Run the experiments in parallel
     results_list = process_map(run_experiment, range(n_experiments), max_workers=10, chunksize=1)
-    # Array of shape (n_experiments, 8, T)
+    # Array of shape (n_experiments, n_learners * 2, T)
     results_array = np.array(results_list)
 
-    # Extract the results into eight arrays of shape (n_experiments, T)
+    # Extract the results into multiple arrays of shape (n_experiments, T)
     inst_reward_clairvoyant = results_array[:, 0, :]
     inst_reward_ucb1 = results_array[:, 1, :]
     inst_reward_swucb = results_array[:, 2, :]
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     # Generate plots of the mean and standard deviation of the results
     plot_statistics(inst_reward_clairvoyant, inst_regret_clairvoyant, 'Clairvoyant', 'Step 5')
     plot_statistics(inst_reward_ucb1, inst_regret_ucb1, 'UCB1', 'Step 5')
-    plot_statistics(inst_reward_swucb, inst_regret_swucb, 'SW-UCB1', 'Step 5')
-    plot_statistics(inst_reward_cducb, inst_regret_cducb, 'CD-UCB1', 'Step 5')
+    plot_statistics(inst_reward_swucb, inst_regret_swucb, 'SW-UCB', 'Step 5')
+    plot_statistics(inst_reward_cducb, inst_regret_cducb, 'CD-UCB', 'Step 5')
     plt.tight_layout()
     plt.show()

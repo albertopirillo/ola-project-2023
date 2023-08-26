@@ -17,7 +17,7 @@ class ClairvoyantAlgorithm:
     def compute_optimal_solution(self) -> None:
         for user_class in range(self.environment.num_classes):
             # Find the best price which requires considering both the conversion rate, and the actual price
-            best_arm_id: int = int(np.argmax(self.environment.arms_mean[user_class]))
+            best_arm_id: int = int(np.argmax(self.environment.conv_rates[user_class] * self.environment.prices))
             best_conv_rate: float = self.environment.conv_rates[user_class][best_arm_id]
             best_price: float = self.environment.prices[best_arm_id]
 

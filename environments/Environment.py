@@ -1,7 +1,6 @@
 import json
-import numpy as np
 from typing import Self
-from sklearn.preprocessing import minmax_scale
+import numpy as np
 
 
 class Environment:
@@ -14,12 +13,6 @@ class Environment:
         self.noise_std = noise_std  # std deviation of the noise to add to the drawn sample
         self.conv_rates = conv_rates  # matrix containing bernoulli distributions of the arms for the prices
         self.class_probabilities = class_probabilities  # distributions of the classes
-        # When learning, consider the [0,1]-normalized conv_rates * prices
-        if len(self.conv_rates.shape) == 2:
-            self.arms_mean = minmax_scale((self.conv_rates * self.prices), axis=1)
-        else:
-            self.arms_mean = [minmax_scale((self.conv_rates[i] * self.prices), axis=1) for i in
-                              range(self.conv_rates.shape[0])]
 
     @classmethod
     def from_json(cls, json_path: str) -> Self:
@@ -46,11 +39,11 @@ class Environment:
                 features[0] = 1
                 features[1] = 1
 
-        reward: int = np.random.binomial(1, self.arms_mean[extracted_class][arm_index])
+        reward: int = np.random.binomial(1, self.conv_rates[extracted_class][arm_index])
         return reward
 
     def round_step4(self, arm_index: int, extracted_class: int) -> int:
-        reward: int = np.random.binomial(1, self.arms_mean[extracted_class][arm_index])
+        reward: int = np.random.binomial(1, self.conv_rates[extracted_class][arm_index])
         return reward
 
     # Function to add noise to the bid_to_click curve whenever a sample is drawn

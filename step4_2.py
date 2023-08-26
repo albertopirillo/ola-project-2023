@@ -17,7 +17,7 @@ from sklearn.exceptions import ConvergenceWarning
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 # Simulation parameters
-T = 360
+T = 365
 n_experiments = 10
 
 
@@ -181,8 +181,8 @@ def run_experiment(_):
 
             # UCB1 and GP-UCB learners
             pulled_arm_pricing = ucb1_learner.pull_arm()
-            pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-            ucb1_learner.update(pulled_arm_pricing, pricing_reward)
+            bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
+            ucb1_learner.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
 
             pulled_arm_advertising = gp_ucb_learner.pull_arm()
             total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=extracted_class)
@@ -193,7 +193,7 @@ def run_experiment(_):
             instantaneous_regret_ucb1[t] = regret
 
             # TS and GP-TS learners
-            pulled_arm_pricing = ts_learner.pull_arm()
+            pulled_arm_pricing = ts_learner.pull_arm(env.prices)
             pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
             ts_learner.update(pulled_arm_pricing, pricing_reward)
 
@@ -210,8 +210,8 @@ def run_experiment(_):
             # UCB1 and GP-UCB learners
             if features[0] == 0:
                 pulled_arm_pricing = ucb1_learner_feature1_0.pull_arm()
-                pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-                ucb1_learner_feature1_0.update(pulled_arm_pricing, pricing_reward)
+                bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
+                ucb1_learner_feature1_0.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
                 pulled_arm_advertising = gp_ucb_learner_feature1_0.pull_arm()
                 total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
                                                   user_class=extracted_class)
@@ -219,8 +219,8 @@ def run_experiment(_):
 
             else:
                 pulled_arm_pricing = ucb1_learner_feature1_1.pull_arm()
-                pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-                ucb1_learner_feature1_1.update(pulled_arm_pricing, pricing_reward)
+                bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
+                ucb1_learner_feature1_1.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
                 pulled_arm_advertising = gp_ucb_learner_feature1_1.pull_arm()
                 total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
                                                   user_class=extracted_class)
@@ -232,7 +232,7 @@ def run_experiment(_):
 
             # TS and GP-TS learners
             if features[0] == 0:
-                pulled_arm_pricing = ts_learner_feature1_0.pull_arm()
+                pulled_arm_pricing = ts_learner_feature1_0.pull_arm(env.prices)
                 pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
                 ts_learner_feature1_0.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_feature1_0.pull_arm()
@@ -241,7 +241,7 @@ def run_experiment(_):
                 gp_ts_learner_feature1_0.update(pulled_arm_advertising, total_reward)
 
             else:
-                pulled_arm_pricing = ts_learner_feature1_1.pull_arm()
+                pulled_arm_pricing = ts_learner_feature1_1.pull_arm(env.prices)
                 pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
                 ts_learner_feature1_1.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_feature1_1.pull_arm()
@@ -258,8 +258,8 @@ def run_experiment(_):
             # UCB1 and GP-UCB learners
             if features[1] == 0:
                 pulled_arm_pricing = ucb1_learner_feature2_0.pull_arm()
-                pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-                ucb1_learner_feature2_0.update(pulled_arm_pricing, pricing_reward)
+                bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
+                ucb1_learner_feature2_0.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
                 pulled_arm_advertising = gp_ucb_learner_feature2_0.pull_arm()
                 total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
                                                   user_class=extracted_class)
@@ -267,8 +267,8 @@ def run_experiment(_):
 
             else:
                 pulled_arm_pricing = ucb1_learner_feature2_1.pull_arm()
-                pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-                ucb1_learner_feature2_1.update(pulled_arm_pricing, pricing_reward)
+                bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
+                ucb1_learner_feature2_1.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
                 pulled_arm_advertising = gp_ucb_learner_feature2_1.pull_arm()
                 total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
                                                   user_class=extracted_class)
@@ -280,7 +280,7 @@ def run_experiment(_):
 
             # TS and GP-TS learners
             if features[1] == 0:
-                pulled_arm_pricing = ts_learner_feature2_0.pull_arm()
+                pulled_arm_pricing = ts_learner_feature2_0.pull_arm(env.prices)
                 pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
                 ts_learner_feature2_0.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_feature2_0.pull_arm()
@@ -288,7 +288,7 @@ def run_experiment(_):
                                                   user_class=extracted_class)
                 gp_ts_learner_feature2_0.update(pulled_arm_advertising, total_reward)
             else:
-                pulled_arm_pricing = ts_learner_feature2_1.pull_arm()
+                pulled_arm_pricing = ts_learner_feature2_1.pull_arm(env.prices)
                 pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
                 ts_learner_feature2_1.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_feature2_1.pull_arm()
@@ -305,8 +305,8 @@ def run_experiment(_):
             # UCB1 and GP-UCB learners
             if features[1] == 0 and features[0] == 1:
                 pulled_arm_pricing = ucb1_learner_c1.pull_arm()
-                pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-                ucb1_learner_c1.update(pulled_arm_pricing, pricing_reward)
+                bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
+                ucb1_learner_c1.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
                 pulled_arm_advertising = gp_ucb_learner_c1.pull_arm()
                 total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
                                                   user_class=extracted_class)
@@ -314,8 +314,8 @@ def run_experiment(_):
 
             elif features[1] == 0 and features[0] == 0:
                 pulled_arm_pricing = ucb1_learner_c2.pull_arm()
-                pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-                ucb1_learner_c2.update(pulled_arm_pricing, pricing_reward)
+                bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
+                ucb1_learner_c2.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
                 pulled_arm_advertising = gp_ucb_learner_c2.pull_arm()
                 total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
                                                   user_class=extracted_class)
@@ -323,8 +323,8 @@ def run_experiment(_):
 
             elif features[1] == 1 and features[0] == 1:
                 pulled_arm_pricing = ucb1_learner_c3.pull_arm()
-                pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-                ucb1_learner_c3.update(pulled_arm_pricing, pricing_reward)
+                bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
+                ucb1_learner_c3.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
                 pulled_arm_advertising = gp_ucb_learner_c3.pull_arm()
                 total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
                                                   user_class=extracted_class)
@@ -332,8 +332,8 @@ def run_experiment(_):
 
             else:
                 pulled_arm_pricing = ucb1_learner_c4.pull_arm()
-                pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-                ucb1_learner_c4.update(pulled_arm_pricing, pricing_reward)
+                bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
+                ucb1_learner_c4.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
                 pulled_arm_advertising = gp_ucb_learner_c4.pull_arm()
                 total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising,
                                                   user_class=extracted_class)
@@ -345,7 +345,7 @@ def run_experiment(_):
 
             # TS and GP-TS learners
             if features[1] == 0 and features[0] == 1:
-                pulled_arm_pricing = ts_learner_c1.pull_arm()
+                pulled_arm_pricing = ts_learner_c1.pull_arm(env.prices)
                 pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
                 ts_learner_c1.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_c1.pull_arm()
@@ -353,7 +353,7 @@ def run_experiment(_):
                                                   user_class=extracted_class)
                 gp_ts_learner_c1.update(pulled_arm_advertising, total_reward)
             elif features[1] == 0 and features[0] == 0:
-                pulled_arm_pricing = ts_learner_c2.pull_arm()
+                pulled_arm_pricing = ts_learner_c2.pull_arm(env.prices)
                 pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
                 ts_learner_c2.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_c2.pull_arm()
@@ -361,7 +361,7 @@ def run_experiment(_):
                                                   user_class=extracted_class)
                 gp_ts_learner_c2.update(pulled_arm_advertising, total_reward)
             elif features[1] == 1 and features[0] == 1:
-                pulled_arm_pricing = ts_learner_c3.pull_arm()
+                pulled_arm_pricing = ts_learner_c3.pull_arm(env.prices)
                 pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
                 ts_learner_c3.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_c3.pull_arm()
@@ -369,7 +369,7 @@ def run_experiment(_):
                                                   user_class=extracted_class)
                 gp_ts_learner_c3.update(pulled_arm_advertising, total_reward)
             else:
-                pulled_arm_pricing = ts_learner_c4.pull_arm()
+                pulled_arm_pricing = ts_learner_c4.pull_arm(env.prices)
                 pricing_reward = env.round_step4(pulled_arm_pricing, extracted_class)
                 ts_learner_c4.update(pulled_arm_pricing, pricing_reward)
                 pulled_arm_advertising = gp_ts_learner_c4.pull_arm()
@@ -388,10 +388,10 @@ def run_experiment(_):
 if __name__ == '__main__':
     # Run the experiments in parallel
     results_list = process_map(run_experiment, range(n_experiments), max_workers=10, chunksize=1)
-    # Array of shape (n_experiments, 6, T)
+    # Array of shape (n_experiments, n_learners * 2, T)
     results_array = np.array(results_list)
 
-    # Extract the results into six arrays of shape (n_experiments, T)
+    # Extract the results into multiple arrays of shape (n_experiments, T)
     inst_reward_clairvoyant = results_array[:, 0, :]
     inst_reward_ucb1 = results_array[:, 1, :]
     inst_reward_ts = results_array[:, 2, :]

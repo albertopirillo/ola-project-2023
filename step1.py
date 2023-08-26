@@ -40,8 +40,17 @@ def run_experiment(_):
 
         # UCB1 learner
         pulled_arm = ucb1_learner.pull_arm()
-        pricing_reward = env.round(pulled_arm)
-        ucb1_learner.update(pulled_arm, pricing_reward)
+        bernoulli_reward = env.round(pulled_arm)
+        ucb1_learner.update(pulled_arm, bernoulli_reward * env.prices[pulled_arm])
+        # True values: [6.2  21.49 18.06 14.12  9.08]
+
+        # print("-------------------------------------------------------------------------------------")
+        # print("Round:", t)
+        # print("Pulled arm:", pulled_arm)
+        # print("Bernoulli Reward:", bernoulli_reward)
+        # print("Reward * price:", bernoulli_reward * env.prices[pulled_arm])
+        # print("Empirical means:", ucb1_learner.empirical_means)
+        # print("Arms beta-confidence:", self.beta * self.confidence)
 
         total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
         instantaneous_reward_ucb1[t] = total_reward
@@ -49,9 +58,17 @@ def run_experiment(_):
         instantaneous_regret_ucb1[t] = regret
 
         # Thompson Sampling learner
-        pulled_arm = ts_learner.pull_arm()
-        pricing_reward = env.round(pulled_arm)
-        ts_learner.update(pulled_arm, pricing_reward)
+        pulled_arm = ts_learner.pull_arm(env.prices)
+        bernoulli_reward = env.round(pulled_arm)
+        ts_learner.update(pulled_arm, bernoulli_reward)
+        # True values: [0.4, 0.7, 0.3, 0.2, 0.1]
+
+        # print("-------------------------------------------------------------------------------------")
+        # print("Round:", t)
+        # print("Pulled arm:", pulled_arm)
+        # print("Bernoulli Reward:", bernoulli_reward)
+        # print("Reward * price:", bernoulli_reward * env.prices[pulled_arm])
+        # print("Empirical means:", ts_learner.get_empirical_means())
 
         total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
         instantaneous_reward_ts[t] = total_reward
@@ -64,11 +81,11 @@ def run_experiment(_):
 
 if __name__ == '__main__':
     # Run the experiments in parallel
-    results_list = process_map(run_experiment, range(n_experiments), max_workers=12, chunksize=1)
-    # Array of shape (n_experiments, 6, T)
+    results_list = process_map(run_experiment, range(n_experiments), max_workers=10, chunksize=1)
+    # Array of shape (n_experiments, n_learners * 2, T)
     results_array = np.array(results_list)
 
-    # Extract the results into six arrays of shape (n_experiments, T)
+    # Extract the results into multiple arrays of shape (n_experiments, T)
     inst_reward_clairvoyant = results_array[:, 0, :]
     inst_reward_ucb1 = results_array[:, 1, :]
     inst_reward_ts = results_array[:, 2, :]

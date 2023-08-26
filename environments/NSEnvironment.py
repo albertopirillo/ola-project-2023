@@ -30,9 +30,9 @@ class NSEnvironment(Environment):
 
         # minmax scale may compute a rounding error giving an arms_mean value
         # slightly higher than 1 which causes an error when computing reward
-        if self.arms_mean[current_phase][extracted_class][pulled_arm] >= 1.:
-            self.arms_mean[current_phase][extracted_class][pulled_arm] = 1
-        reward: int = np.random.binomial(1, self.arms_mean[current_phase][extracted_class][pulled_arm])
+        if self.conv_rates[current_phase][extracted_class][pulled_arm] >= 1.:
+            self.conv_rates[current_phase][extracted_class][pulled_arm] = 1
+        reward: int = np.random.binomial(1, self.conv_rates[current_phase][extracted_class][pulled_arm])
         return reward
 
     def compute_reward(self, price_index: int, bid_index: int, user_class: int, phase: int) -> float:
