@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+
+sns.set_theme()
 
 
 def compute_statistics(instantaneous_values: np.ndarray[float]) -> \
@@ -22,14 +25,15 @@ def compute_statistics(instantaneous_values: np.ndarray[float]) -> \
     return inst_mean, inst_std, cumulative_mean, cumulative_std
 
 
-def plot_with_std(figure_id: int, y_label: str, curve_label: str, title: str,
-                  values_mean: np.ndarray[float], values_std: np.ndarray[float]) -> None:
+def plot_with_std(figure_id: int, y_label: str, curve_label: str, title: str, values_mean: np.ndarray[float],
+                  values_std: np.ndarray[float], context: bool = False) -> None:
     """
     Plot the mean of the values with the corresponding standard deviation
     :param figure_id: the id of the figure
     :param y_label: the label of the y-axis
     :param curve_label: the label to show on the legend
     :param title: the title of the plot
+    :param context: whether the plot is for the context or not
     :param values_mean: a 1D array of shape (num_time_instants) containing the mean of the values
     :param values_std: a 1D array of shape (num_time_instants) containing the std of the values
     :return:
@@ -37,8 +41,11 @@ def plot_with_std(figure_id: int, y_label: str, curve_label: str, title: str,
     plt.figure(figure_id, figsize=(16, 8))
     plt.xlabel('t')
     plt.ylabel(y_label)
-    plt.plot(values_mean, label=curve_label)
-    plt.fill_between(range(len(values_mean)), values_mean - values_std, values_mean + values_std, alpha=0.2)
+    if context:
+        plt.yticks(np.arange(4), ['One class', 'Two classes on F1', 'Two classes on F2', 'Four classes'])
+
+    sns.lineplot(values_mean, label=curve_label)
+    plt.fill_between(np.arange(len(values_mean)), values_mean - values_std, values_mean + values_std, alpha=0.25)
     plt.title(title)
     plt.grid(True)
     plt.legend()
@@ -65,11 +72,11 @@ def plot_statistics(instantaneous_rewards: np.ndarray[float], instantaneous_regr
 
 
 def plot_contexts(contexts: list[np.ndarray[int]], labels: list[str], title: str) -> None:
+    title = f'{title} ({len(contexts[0])} experiments)'
     for context, label in zip(contexts, labels):
-        title = f'{title} ({len(context)} experiments)'
         mean = np.mean(context, axis=0)
         std = np.std(context, axis=0)
-        plot_with_std(4, 'Context history', label, title, mean, std)
+        plot_with_std(4, 'Context history', label, title, mean, std, context=True)
 
 
 def hoeffding_bound(empiric_mean: float, confidence: float, z: int) -> float:
