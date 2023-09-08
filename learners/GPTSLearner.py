@@ -1,7 +1,8 @@
-from learners.Learner import Learner
 import numpy as np
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+
+from learners.Learner import Learner
 
 
 class GPTSLearner(Learner):
@@ -37,6 +38,10 @@ class GPTSLearner(Learner):
         self.update_observations(pulled_arm, reward)
         self.update_model()
 
-    def pull_arm(self) -> int:
+    def pull_arm(self, prices: np.ndarray[float] = None) -> int:
         sampled_values = np.random.normal(self.means, self.sigmas)
         return int(np.argmax(sampled_values))
+
+    def get_best_expected_value(self) -> float:
+        best = np.max(self.means)
+        return best

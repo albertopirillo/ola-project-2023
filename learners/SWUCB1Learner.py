@@ -1,5 +1,6 @@
-from learners.UCB1Learner import UCB1Learner
 import numpy as np
+
+from learners.UCB1Learner import UCB1Learner
 
 
 class SWUCB1Learner(UCB1Learner):
@@ -8,7 +9,7 @@ class SWUCB1Learner(UCB1Learner):
         self.windows_size = windows_size
         self.pulled_arms = np.array([])
         # Hyperparameter that controls the exploration-exploitation tradeoff
-        self.beta = 90.8
+        self.beta = 1.0
 
     def update(self, pulled_arm: int, reward: float) -> None:
         self.t += 1

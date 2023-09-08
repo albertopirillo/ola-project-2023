@@ -1,6 +1,7 @@
-from learners.UCB1Learner import UCB1Learner
-from learners.CUSUM import CUSUM
 import numpy as np
+
+from learners.CUSUM import CUSUM
+from learners.UCB1Learner import UCB1Learner
 
 
 class CDUCBLearner(UCB1Learner):
@@ -13,7 +14,7 @@ class CDUCBLearner(UCB1Learner):
         # Hyperparameter that controls the exploration-exploitation tradeoff
         self.beta = 3.0
 
-    def pull_arm(self) -> int:
+    def pull_arm(self, prices: np.ndarray[float] = None) -> int:
         # with probability 1-alpha select the arm with the highest upper confidence bound
         if np.random.binomial(1, 1 - self.alpha):
             upper_conf = self.empirical_means + self.beta * self.confidence

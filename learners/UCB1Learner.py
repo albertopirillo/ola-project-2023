@@ -1,4 +1,5 @@
 import numpy as np
+
 from learners.Learner import Learner
 
 
@@ -10,9 +11,9 @@ class UCB1Learner(Learner):
         # Hyperparameter that controls the exploration-exploitation tradeoff.
         # Higher values encourage more exploration.
         # Default is 1.0
-        self.beta = 90.8
+        self.beta = 1.0
 
-    def pull_arm(self) -> int:
+    def pull_arm(self, prices: np.ndarray[float] = None) -> int:
         upper_conf = self.empirical_means + self.beta * self.confidence
         return np.random.choice(np.where(upper_conf == upper_conf.max())[0])
 
@@ -25,6 +26,6 @@ class UCB1Learner(Learner):
             self.confidence[a] = ((2 * np.log(self.t) / n_samples) ** 0.5) if n_samples > 0 else np.inf
         self.update_observations(pull_arm, reward)
 
-    def get_best_expected_value(self) -> int:
-        best = int(np.max(self.empirical_means))
+    def get_best_expected_value(self) -> float:
+        best = np.max(self.empirical_means)
         return best

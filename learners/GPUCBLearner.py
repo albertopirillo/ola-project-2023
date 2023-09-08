@@ -1,7 +1,8 @@
-from learners.Learner import Learner
 import numpy as np
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, ConstantKernel as C
+
+from learners.Learner import Learner
 
 
 class GPUCBLearner(Learner):
@@ -40,7 +41,7 @@ class GPUCBLearner(Learner):
         self.nt[pulled_arm] += 1
         self.update_betas()
 
-    def pull_arm(self) -> int:
+    def pull_arm(self, prices: np.ndarray[float] = None) -> int:
         sampled_value = int(np.argmax(self.means + self.sigmas * self.beta))
         return sampled_value
 

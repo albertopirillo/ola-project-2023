@@ -40,6 +40,7 @@ def plot_with_std(figure_id: int, y_label: str, curve_label: str, title: str,
     plt.plot(values_mean, label=curve_label)
     plt.fill_between(range(len(values_mean)), values_mean - values_std, values_mean + values_std, alpha=0.2)
     plt.title(title)
+    plt.grid(True)
     plt.legend()
 
 
@@ -61,6 +62,14 @@ def plot_statistics(instantaneous_rewards: np.ndarray[float], instantaneous_regr
     plot_with_std(1, 'Instantaneous regret', legend_label, title, i_regret_mean, i_regret_std)
     plot_with_std(2, 'Cumulative reward', legend_label, title, c_reward_mean, c_reward_std)
     plot_with_std(3, 'Cumulative regret', legend_label, title, c_regret_mean, c_regret_std)
+
+
+def plot_contexts(contexts: list[np.ndarray[int]], labels: list[str], title: str) -> None:
+    for context, label in zip(contexts, labels):
+        title = f'{title} ({len(context)} experiments)'
+        mean = np.mean(context, axis=0)
+        std = np.std(context, axis=0)
+        plot_with_std(4, 'Context history', label, title, mean, std)
 
 
 def hoeffding_bound(empiric_mean: float, confidence: float, z: int) -> float:

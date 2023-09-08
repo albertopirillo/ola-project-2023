@@ -1,5 +1,8 @@
+import warnings
+
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.exceptions import ConvergenceWarning
 from tqdm.contrib.concurrent import process_map
 
 from environments.ClairvoyantAlgorithm import ClairvoyantAlgorithm
@@ -10,8 +13,6 @@ from learners.TSLearner import TSLearner
 from learners.UCB1Learner import UCB1Learner
 from utils import plot_statistics
 
-import warnings
-from sklearn.exceptions import ConvergenceWarning
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 # Simulation parameters
@@ -105,7 +106,7 @@ if __name__ == '__main__':
 
     # Generate plots of the mean and standard deviation of the results
     plot_statistics(inst_reward_clairvoyant, inst_regret_clairvoyant, 'Clairvoyant', 'Step 4.3 - One context')
-    plot_statistics(inst_reward_ucb1, inst_regret_ucb1, 'UCB1 & GP-UCB', 'Step 4.3')
-    plot_statistics(inst_reward_ts, inst_regret_ts, 'TS & GP-TS', 'Step 4.3')
+    plot_statistics(inst_reward_ucb1, inst_regret_ucb1, 'UCB1 & GP-UCB', 'Step 4.3 - One context')
+    plot_statistics(inst_reward_ts, inst_regret_ts, 'TS & GP-TS', 'Step 4.3 - One context')
     plt.tight_layout()
     plt.show()
