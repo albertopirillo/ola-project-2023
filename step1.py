@@ -42,15 +42,6 @@ def run_experiment(_):
         pulled_arm = ucb1_learner.pull_arm()
         bernoulli_reward = env.round(pulled_arm)
         ucb1_learner.update(pulled_arm, bernoulli_reward * env.prices[pulled_arm])
-        # True values: [6.2  21.49 18.06 14.12  9.08]
-
-        # print("-------------------------------------------------------------------------------------")
-        # print("Round:", t)
-        # print("Pulled arm:", pulled_arm)
-        # print("Bernoulli Reward:", bernoulli_reward)
-        # print("Reward * price:", bernoulli_reward * env.prices[pulled_arm])
-        # print("Empirical means:", ucb1_learner.empirical_means)
-        # print("Arms beta-confidence:", self.beta * self.confidence)
 
         total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
         instantaneous_reward_ucb1[t] = total_reward
@@ -61,14 +52,6 @@ def run_experiment(_):
         pulled_arm = ts_learner.pull_arm(env.prices)
         bernoulli_reward = env.round(pulled_arm)
         ts_learner.update(pulled_arm, bernoulli_reward)
-        # True values: [0.4, 0.7, 0.3, 0.2, 0.1]
-
-        # print("-------------------------------------------------------------------------------------")
-        # print("Round:", t)
-        # print("Pulled arm:", pulled_arm)
-        # print("Bernoulli Reward:", bernoulli_reward)
-        # print("Reward * price:", bernoulli_reward * env.prices[pulled_arm])
-        # print("Empirical means:", ts_learner.get_empirical_means())
 
         total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
         instantaneous_reward_ts[t] = total_reward
