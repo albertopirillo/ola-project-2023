@@ -13,8 +13,8 @@ from sklearn.exceptions import ConvergenceWarning
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 # Simulation parameters
-T = 200
-n_experiments = 100
+T = 365
+n_experiments = 250
 
 
 def run_experiment(_):

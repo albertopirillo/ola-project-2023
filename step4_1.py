@@ -73,7 +73,7 @@ def run_experiment(_):
         if features[0] == 0 and features[1] == 0:
             pulled_arm_pricing = ucb1_learner1.pull_arm()
             bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-            ucb1_learner1.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
+            ucb1_learner1.update(pulled_arm_pricing, float(bernoulli_reward * env.prices[pulled_arm_pricing]))
             pulled_arm_advertising = gp_ucb_learner1.pull_arm()
             total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=0)
             gp_ucb_learner1.update(pulled_arm_advertising, total_reward)
@@ -81,7 +81,7 @@ def run_experiment(_):
         elif features[0] == 1 and features[1] == 1:
             pulled_arm_pricing = ucb1_learner3.pull_arm()
             bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-            ucb1_learner3.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
+            ucb1_learner3.update(pulled_arm_pricing, float(bernoulli_reward * env.prices[pulled_arm_pricing]))
             pulled_arm_advertising = gp_ucb_learner3.pull_arm()
             total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=2)
             gp_ucb_learner3.update(pulled_arm_advertising, total_reward)
@@ -89,7 +89,7 @@ def run_experiment(_):
         else:
             pulled_arm_pricing = ucb1_learner2.pull_arm()
             bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-            ucb1_learner2.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
+            ucb1_learner2.update(pulled_arm_pricing, float(bernoulli_reward * env.prices[pulled_arm_pricing]))
             pulled_arm_advertising = gp_ucb_learner2.pull_arm()
             total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=1)
             gp_ucb_learner2.update(pulled_arm_advertising, total_reward)

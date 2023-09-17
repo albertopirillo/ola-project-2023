@@ -41,7 +41,7 @@ def run_experiment(_):
         # UCB1 learner
         pulled_arm = ucb1_learner.pull_arm()
         bernoulli_reward = env.round(pulled_arm)
-        ucb1_learner.update(pulled_arm, bernoulli_reward * env.prices[pulled_arm])
+        ucb1_learner.update(pulled_arm, float(bernoulli_reward * env.prices[pulled_arm]))
 
         total_reward = env.compute_reward(pulled_arm, opt_bid_id, user_class=0)
         instantaneous_reward_ucb1[t] = total_reward

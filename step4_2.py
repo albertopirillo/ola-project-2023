@@ -80,7 +80,7 @@ def update_pricing_learner(env: Environment, features: list[int, int], extracted
     bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
 
     if isinstance(learner, UCB1Learner):
-        learner.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
+        learner.update(pulled_arm_pricing, float(bernoulli_reward * env.prices[pulled_arm_pricing]))
     else:
         learner.update(pulled_arm_pricing, bernoulli_reward)
 
@@ -358,7 +358,7 @@ if __name__ == '__main__':
     plot_statistics(inst_reward_ucb1, inst_regret_ucb1, 'UCB1 & GP-UCB', 'Step 4.2 - Context generation')
     plot_statistics(inst_reward_ts, inst_regret_ts, 'TS & GP-TS', 'Step 4.2 - Context generation')
 
-    # Generate a plot to keep track of the evolution of the context generation
+    # Generate a plots to keep track of the evolution of the context generation
     plot_contexts([pricing_context_history_ucb, pricing_context_history_ts, advertising_context_history_ucb,
                    advertising_context_history_ts], ['Pricing UCB', 'Pricing TS', 'Advertising UCB', 'Advertising TS'],
                   title='Step 4.2 - Context generation')

@@ -16,7 +16,7 @@ warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
 
 # Simulation parameters
 T = 200
-n_experiments = 100
+n_experiments = 250
 
 
 def run_experiment(_):
@@ -48,7 +48,7 @@ def run_experiment(_):
         # UCB1 and GP-UCB learners
         pulled_arm_pricing = ucb1_learner.pull_arm()
         bernoulli_reward = env.round(pulled_arm_pricing)
-        ucb1_learner.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
+        ucb1_learner.update(pulled_arm_pricing, float(bernoulli_reward * env.prices[pulled_arm_pricing]))
 
         pulled_arm_advertising = gp_ucb_learner.pull_arm()
         total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=0)

@@ -63,7 +63,7 @@ def run_experiment(_):
         # UCB1 and GP-UCB learners
         pulled_arm_pricing = ucb1_learner.pull_arm()
         bernoulli_reward = env.round_step4(pulled_arm_pricing, extracted_class)
-        ucb1_learner.update(pulled_arm_pricing, bernoulli_reward * env.prices[pulled_arm_pricing])
+        ucb1_learner.update(pulled_arm_pricing, float(bernoulli_reward * env.prices[pulled_arm_pricing]))
 
         pulled_arm_advertising = gp_ucb_learner.pull_arm()
         total_reward = env.compute_reward(pulled_arm_pricing, pulled_arm_advertising, user_class=extracted_class)
