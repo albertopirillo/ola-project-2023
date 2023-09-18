@@ -11,6 +11,7 @@ from utils import plot_statistics
 import warnings
 from sklearn.exceptions import ConvergenceWarning
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
+warnings.filterwarnings(action='ignore', category=FutureWarning)
 
 # Simulation parameters
 T = 365
