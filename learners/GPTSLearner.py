@@ -19,8 +19,8 @@ class GPTSLearner(Learner):
         # alpha: small constant added to prevent numerical issues
         # sigma: controls the noise point, the higher the value, the more noise in the data.
         # Large values of sigma result in a larger confidence interval.
-        self.kernel = C(1., (1e-5, 1e5)) * RBF(length_scale=1.0, length_scale_bounds=(1e-5, 1e5))
-        self.gp = GaussianProcessRegressor(kernel=self.kernel, alpha=0.25, normalize_y=True, n_restarts_optimizer=5)
+        self.kernel = RBF(length_scale=0.25, length_scale_bounds=(1e-12, 1e5))
+        self.gp = GaussianProcessRegressor(kernel=self.kernel, alpha=0.25, normalize_y=True, n_restarts_optimizer=7)
 
     def update_observations(self, arm_idx: int, reward: float) -> None:
         super().update_observations(arm_idx, reward)
