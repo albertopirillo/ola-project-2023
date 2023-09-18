@@ -15,11 +15,10 @@ n_experiments = 5000
 window_size = 100
 
 # CUSUM parameters
-M = 20
-eps = 0.05
-h = 20
-alpha = 0.01
-
+M = 120
+eps = 0.5
+h = 80
+alpha = 0.1
 
 def run_experiment(_):
     # For every experiment, we define new environment and learners
