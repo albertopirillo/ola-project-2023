@@ -1,4 +1,4 @@
-import warnings
+
 from enum import Enum, auto
 
 import matplotlib.pyplot as plt
@@ -15,11 +15,13 @@ from learners.TSLearner import TSLearner
 from learners.UCB1Learner import UCB1Learner
 from utils import plot_statistics, hoeffding_bound, plot_contexts
 
+import warnings
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
+warnings.filterwarnings(action='ignore', category=FutureWarning)
 
 # Simulation parameters
 T = 365
-n_experiments = 10
+n_experiments = 250
 hoeffding_bound_confidence = 0.8
 
 

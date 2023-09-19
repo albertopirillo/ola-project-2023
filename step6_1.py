@@ -8,6 +8,9 @@ from environments.NSClairvoyantAlgorithm import NSClairvoyantAlgorithm
 from environments.NSEnvironment import NSEnvironment
 from utils import plot_statistics
 
+import warnings
+warnings.filterwarnings(action='ignore', category=FutureWarning)
+
 # Simulation parameters
 T = 365  # n.b.: T must be equal to horizon parameter in the JSON file
 n_experiments = 5000

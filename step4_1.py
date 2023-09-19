@@ -1,5 +1,3 @@
-import warnings
-
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.exceptions import ConvergenceWarning
@@ -13,11 +11,13 @@ from learners.TSLearner import TSLearner
 from learners.UCB1Learner import UCB1Learner
 from utils import plot_statistics
 
+import warnings
 warnings.filterwarnings(action='ignore', category=ConvergenceWarning)
+warnings.filterwarnings(action='ignore', category=FutureWarning)
 
 # Simulation parameters
 T = 365
-n_experiments = 10
+n_experiments = 250
 
 
 def run_experiment(_):

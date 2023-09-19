@@ -9,6 +9,9 @@ from learners.CDUCBLearner import CDUCBLearner
 from learners.UCB1Learner import UCB1Learner
 from utils import plot_statistics
 
+import warnings
+warnings.filterwarnings(action='ignore', category=FutureWarning)
+
 # Simulation parameters
 T = 365  # n.b.: T must be equal to horizon parameter in the JSON file
 n_experiments = 5000
@@ -19,6 +22,7 @@ M = 120
 eps = 0.5
 h = 80
 alpha = 0.1
+
 
 def run_experiment(_):
     # For every experiment, we define new environment and learners

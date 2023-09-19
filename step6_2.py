@@ -10,6 +10,9 @@ from learners.UCB1Learner import UCB1Learner
 from learners.EXP3Learner import EXP3Learner
 from utils import plot_statistics
 
+import warnings
+warnings.filterwarnings(action='ignore', category=FutureWarning)
+
 # Simulation parameters
 T = 365  # n.b.: T must be equal to horizon parameter in the JSON file
 n_experiments = 5000
