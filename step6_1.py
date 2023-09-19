@@ -14,10 +14,10 @@ n_experiments = 5000
 window_size = 100
 
 # CUSUM parameters
-M = 20
-eps = 0.05
-h = 20
-alpha = 0.01
+M = 50
+eps = 0.5
+h = 40
+alpha = 0.1
 
 # EXP3 parameter
 gamma = 0.01
