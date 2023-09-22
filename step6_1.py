@@ -17,9 +17,9 @@ n_experiments = 5000
 window_size = 100
 
 # CUSUM parameters
-M = 50
+M = 150
 eps = 0.5
-h = 40
+h = 120
 alpha = 0.1
 
 # EXP3 parameter
